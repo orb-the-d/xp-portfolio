@@ -1,0 +1,528 @@
+body {
+  margin: 0;
+  overflow: hidden;
+  font-family: sans-serif;
+}
+
+canvas {
+  display: block;
+}
+
+/* OS container over the 3D monitor */
+#os-screen {
+  position: absolute;
+  width: 702px;
+  height: 368px;
+  top: 89px;
+  left: 269px;
+  border: 2px solid #3b3b3b;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.6);
+  display: none;
+
+  /* XP color tokens */
+  --xp-blue-dark: #003c74;
+  --xp-blue-medium: #3a6ea5;
+  --xp-blue-light: #d6e6f5;
+  --xp-green-start-top: #00a000;
+  --xp-green-start-bottom: #006000;
+  --xp-taskbar-top: #0060c0;
+  --xp-taskbar-bottom: #00428c;
+  --xp-window-bg: #ece9d8;
+  --xp-window-border: #3a6ea5;
+}
+
+/* Boot screen */
+#os-boot-screen {
+  position: absolute;
+  inset: 0;
+  background: #000000 url("/xp-boot1.png") center center no-repeat;
+  background-size: cover;
+  z-index: 2;
+}
+
+/* LOGIN SCREEN */
+#xp-login-screen {
+  position: absolute;
+  inset: 0;
+  background: #245edb url("/xp-login.jpg") center center no-repeat;
+  background-size: cover;
+  display: none;
+  z-index: 3;
+}
+
+#xp-login-account {
+  position: absolute;
+  left: 60%;
+  top: 35%;
+  width: 170px;
+  height: 190px;
+  cursor: pointer;
+}
+
+/* Desktop + bottom taskbar + windows */
+#os-windows {
+  position: relative;
+  z-index: 1;
+  height: 100%;
+  background: transparent;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Desktop area with wallpaper */
+#xp-desktop {
+  position: relative;
+  flex: 1;
+  background: #004e98 url("/xp-wallpaper.jpg") center center no-repeat;
+  background-size: cover;
+  overflow: hidden;
+}
+
+/* Desktop icons: 2 columns, 5 rows max per column */
+.xp-icon-column {
+  position: absolute;
+  top: 16px;
+  left: 12px;
+  display: grid;
+  grid-auto-flow: column;
+  grid-template-rows: repeat(5, auto);
+  grid-auto-columns: 80px;
+  row-gap: 8px;
+  column-gap: 20px;
+}
+
+/* base desktop icon */
+.xp-icon {
+  width: 80px;
+  text-align: center;
+  color: #ffffff;
+  font-size: 11px;
+  text-shadow: 0 1px 2px #000;
+  cursor: default;
+  padding: 2px 2px 4px;
+  border-radius: 3px;
+}
+
+/* icon hover + selected frame (very light) */
+.xp-icon:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.xp-icon.selected,
+.xp-icon:focus-visible {
+  outline: none;
+  background: rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+}
+
+/* icon image wrapper + image itself */
+.xp-icon-img {
+  width: 32px;
+  height: 32px;
+  margin: 0 auto 1px;
+}
+
+.xp-icon-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 6px;
+  background: transparent;
+}
+
+/* Area where app windows appear */
+#xp-window-area {
+  position: absolute;
+  top: 40px;
+  left: 140px;
+  right: 20px;
+  bottom: 40px;
+}
+
+/* XP-like taskbar at bottom */
+#xp-taskbar {
+  position: relative;
+  height: 28px;
+  background: linear-gradient(var(--xp-taskbar-top), var(--xp-taskbar-bottom));
+  border-top: 0;              /* was 1px solid #00275d */
+  display: flex;
+  align-items: center;
+  padding: 0;
+  gap: 0;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+
+
+/* light radial glow on the right */
+#xp-taskbar::before {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 55%;
+  background:
+    radial-gradient(circle at 100% 50%,
+      rgba(255, 255, 255, 0.45) 0%,
+      rgba(255, 255, 255, 0.12) 35%,
+      rgba(255, 255, 255, 0.0) 75%);
+  pointer-events: none;
+}
+
+/* Curved XP-style Start button */
+#xp-start-button {
+  position: relative;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 12px 5px 16px;
+  background: linear-gradient(#2ad043, #0d6b16);
+  color: #ffffff;
+  font-weight: bold;
+  font-size: 13px;
+  text-transform: lowercase;
+  border: none;                 /* no visible border lines */
+  border-radius: 0 9px 9px 0; /* curve only on right */
+  box-shadow:
+    0 0 0 1px #044006,          /* outline all around */
+    inset 0 1px 0 rgba(255,255,255,0.55),
+    inset 0 -1px 0 rgba(0,0,0,0.35),
+    0 1px 2px rgba(0,0,0,0.6);
+  cursor: pointer;
+  margin-left: -1px;            /* overlap left edge of taskbar */
+  margin-top: -1px;             /* overlap top edge */
+  margin-bottom: -1px;          /* overlap bottom edge */
+}
+
+
+#xp-start-button .xp-start-logo {
+  width: 16px;
+  height: 16px;
+  display: inline-block;
+}
+
+#xp-start-button .xp-start-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+#xp-start-button .xp-start-text {
+  line-height: 1;
+}
+
+#xp-start-button:hover {
+  background: linear-gradient(#32e24e, #0f7c19);
+}
+
+#xp-start-button:active {
+  background: linear-gradient(#0f7c19, #075010);
+  box-shadow:
+    inset 0 2px 3px rgba(0,0,0,0.55);
+  padding-top: 3px;
+  padding-bottom: 3px;
+}
+
+/* Taskbar apps – dynamic */
+#xp-taskbar-area {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  display: flex;
+  gap: 4px;
+}
+
+.taskbar-app {
+  max-width: 140px;
+  height: 24px;
+  background: #0d5ec7;
+  color: #ffffff;
+  border: 1px solid #003d80;
+  border-radius: 3px;
+  padding: 0 6px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+.taskbar-app img {
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+}
+
+.taskbar-app span {
+  font-size: 11px;
+  color: #ffffff;
+}
+
+.taskbar-app:hover {
+  background: #1a72e0;
+}
+
+/* clock tray box on the right */
+#xp-clock {
+  position: relative;
+  z-index: 2;
+  padding: 5px 10px 9px 10px;
+  background: linear-gradient(#dbe9ff, #b3c9f2);
+  color: #000000;
+  font-size: 11px;
+  border: none;
+  border-radius: 5px 0 0 5px;
+  box-shadow:
+    0 0 0 1px #4f74b5,
+    inset 0 1px 0 rgba(255,255,255,0.6),
+    inset 0 -1px 0 rgba(0,0,0,0.25);
+  margin-right: -2px;   /* overlap edges a bit more */
+  margin-top: -2px;
+  margin-bottom: -2px;
+}
+
+
+
+/* Start menu */
+#xp-start-menu {
+  position: absolute;
+  left: 4px;
+  bottom: 30px;
+  width: 200px;
+  height: 220px;
+  background: var(--xp-blue-light);
+  border: 2px solid var(--xp-blue-dark);
+  border-radius: 4px 4px 0 0;
+  display: none;
+  z-index: 3;
+  box-shadow: 0 0 10px rgba(0,0,0,0.6);
+  flex-direction: column;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 120ms ease-out, transform 120ms ease-out;
+}
+
+#xp-start-menu.open {
+  display: flex;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.xp-start-header {
+  height: 38px;
+  background: linear-gradient(#3c6eb4, #28518a);
+  display: flex;
+  align-items: center;
+  padding: 4px 6px;
+  box-sizing: border-box;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.xp-start-header img {
+  width: 26px;
+  height: 26px;
+  border-radius: 3px;
+  margin-right: 6px;
+  object-fit: cover;
+  border: 1px solid #ffffff;
+}
+
+.xp-start-body {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+}
+
+.xp-start-left {
+  width: 60%;
+  background: #ffffff;
+  padding: 4px;
+  box-sizing: border-box;
+  border-right: 1px solid #aac3e5;
+}
+
+.xp-start-right {
+  width: 40%;
+  background: linear-gradient(#dbe8fb, #b8ccef);
+  padding: 4px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* start menu app items */
+.xp-start-app {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 3px;
+  cursor: pointer;
+  font-size: 11px;
+  color: #000;
+  border-radius: 2px;
+  outline: none;
+}
+
+.xp-start-app img {
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+}
+
+.xp-start-app:hover,
+.xp-start-app:focus {
+  background: #cfe3ff;
+}
+
+/* right side links */
+.xp-start-right-section {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.xp-section-title {
+  font-weight: bold;
+  color: #003c74;
+  margin-bottom: 2px;
+  font-size: 11px;
+}
+
+.xp-section-item {
+  font-size: 11px;
+  cursor: default;
+}
+
+/* full-width blue footer bar under start menu */
+.xp-start-bottom {
+  width: 100%;
+  height: 32px;
+  background: linear-gradient(#2f65b0, #244a84);
+  border-top: 1px solid #1d3b73;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 2px 6px;
+}
+
+.xp-start-right-bottom {
+  display: flex;
+  gap: 6px;
+}
+
+/* compact logoff / shutdown buttons */
+.xp-logoff,
+.xp-shutdown {
+  padding: 0 3px;
+  margin: 0;
+  border-radius: 3px;
+  border: 1px solid rgba(255,255,255,0.35);
+  background: transparent;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0;
+}
+
+.xp-logoff img,
+.xp-shutdown img {
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 1px rgba(0,0,0,0.4));
+}
+
+.xp-logoff:hover,
+.xp-shutdown:hover {
+  background: rgba(255,255,255,0.12);
+}
+
+/* App windows – static size, XP style buttons */
+.app-window {
+  position: absolute;
+  inset: 20px 24px 32px 24px;
+  background: var(--xp-window-bg);
+  color: #000;
+  border-radius: 4px;
+  border: 1px solid var(--xp-window-border);
+  overflow: hidden;
+  display: none;
+  font-size: 14px;
+  box-shadow: 0 0 0 1px #ffffff,
+              0 0 0 2px #9db9e8,
+              4px 4px 8px rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  transform: scale(0.98);
+  transition: opacity 160ms ease-out, transform 160ms ease-out;
+  box-sizing: border-box;
+}
+
+.app-window.visible {
+  display: block;
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Title bar + caption buttons */
+.win-titlebar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 2px 4px 2px 8px;
+  background: linear-gradient(#3a6ea5, #2b4f7b);
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: bold;
+}
+
+.win-titlebar-buttons {
+  display: inline-flex;
+  gap: 2px;
+}
+
+/* Min / Max / Close buttons styled like XP */
+.win-btn {
+  width: 18px;
+  height: 18px;
+  border-radius: 2px;
+  border: 1px solid #1f3f67;
+  background: #3468b4;
+  color: #ffffff;
+  padding: 0;
+  cursor: pointer;
+  font-size: 11px;
+  line-height: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.win-btn span {
+  pointer-events: none;
+}
+
+.win-btn-close {
+  border-color: #8b1a10;
+  background: #e5534b;
+}
+
+.win-btn:hover {
+  filter: brightness(1.1);
+}
+
+.win-content {
+  padding: 8px;
+  height: calc(100% - 24px);
+  overflow: auto;
+  background: #f5f5f5;
+}

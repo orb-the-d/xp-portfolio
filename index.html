@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Portfolio Desktop</title>
+  <link rel="stylesheet" href="/src/styles/os.css" />
+</head>
+<body>
+  <!-- OS overlay -->
+  <div id="os-screen">
+    <!-- Boot screen -->
+    <div id="os-boot-screen"></div>
+
+    <!-- LOGIN screen (click account to continue) -->
+    <div id="xp-login-screen">
+      <div id="xp-login-account" aria-label="Login account" role="button" tabindex="0"></div>
+    </div>
+
+    <!-- XP-style desktop + bottom taskbar + app windows -->
+    <div id="os-windows">
+      <div id="xp-desktop">
+        <!-- desktop icons -->
+        <div class="xp-icon-column">
+          <!-- Order: Certs & Studies, Projects, LinkedIn, CV, Contact, GitHub -->
+          <div class="xp-icon" data-app="certs" tabindex="0">
+            <div class="xp-icon-img">
+              <img src="/icons/cert.png" alt="Certifications & Studies" />
+            </div>
+            <span>Certs &amp; Studies</span>
+          </div>
+
+          <div class="xp-icon" data-app="projects" tabindex="0">
+            <div class="xp-icon-img">
+              <img src="/icons/proj.png" alt="Projects" />
+            </div>
+            <span>Projects</span>
+          </div>
+
+          <div class="xp-icon" data-app="linkedin" tabindex="0">
+            <div class="xp-icon-img">
+              <img src="/icons/linkedin_logo.png" alt="LinkedIn" />
+            </div>
+            <span>LinkedIn</span>
+          </div>
+
+          <div class="xp-icon" data-app="resume" tabindex="0">
+            <div class="xp-icon-img">
+              <img src="/icons/cv_logo.png" alt="CV" />
+            </div>
+            <span>CV</span>
+          </div>
+
+          <div class="xp-icon" data-app="contact" tabindex="0">
+            <div class="xp-icon-img">
+              <img src="/icons/contact_me.png" alt="Contact Me" />
+            </div>
+            <span>Contact</span>
+          </div>
+
+          <div class="xp-icon" data-app="github" tabindex="0">
+            <div class="xp-icon-img">
+              <img src="/icons/github-logo.png" alt="GitHub" />
+            </div>
+            <span>GitHub</span>
+          </div>
+        </div>
+
+        <!-- area where app windows appear -->
+        <div id="xp-window-area">
+          <!-- CV app -->
+          <div id="app-resume" class="app-window" role="dialog" aria-label="Curriculum Vitae">
+            <div class="win-titlebar">
+              <span>Curriculum Vitae</span>
+              <div class="win-titlebar-buttons">
+                <button class="win-btn win-btn-min" data-minimize="resume" aria-label="Minimize"><span>_</span></button>
+                <button class="win-btn win-btn-max" data-maximize="resume" aria-label="Maximize"><span>▢</span></button>
+                <button class="win-btn win-btn-close" data-close="resume" aria-label="Close"><span>X</span></button>
+              </div>
+            </div>
+            <div class="win-content">
+              <p>You can download my full CV here:</p>
+              <a href="/files/My_CV.pdf" target="_blank">Open CV (PDF)</a>
+            </div>
+          </div>
+
+          <!-- LinkedIn app -->
+          <div id="app-linkedin" class="app-window" role="dialog" aria-label="LinkedIn">
+            <div class="win-titlebar">
+              <span>LinkedIn</span>
+              <div class="win-titlebar-buttons">
+                <button class="win-btn win-btn-min" data-minimize="linkedin" aria-label="Minimize"><span>_</span></button>
+                <button class="win-btn win-btn-max" data-maximize="linkedin" aria-label="Maximize"><span>▢</span></button>
+                <button class="win-btn win-btn-close" data-close="linkedin" aria-label="Close"><span>X</span></button>
+              </div>
+            </div>
+            <div class="win-content">
+              <p>Connect with me on LinkedIn:</p>
+              <a href="https://www.linkedin.com/in/YOUR_HANDLE" target="_blank">
+                Open LinkedIn profile
+              </a>
+            </div>
+          </div>
+
+          <!-- GitHub app -->
+          <div id="app-github" class="app-window" role="dialog" aria-label="GitHub">
+            <div class="win-titlebar">
+              <span>GitHub</span>
+              <div class="win-titlebar-buttons">
+                <button class="win-btn win-btn-min" data-minimize="github" aria-label="Minimize"><span>_</span></button>
+                <button class="win-btn win-btn-max" data-maximize="github" aria-label="Maximize"><span>▢</span></button>
+                <button class="win-btn win-btn-close" data-close="github" aria-label="Close"><span>X</span></button>
+              </div>
+            </div>
+            <div class="win-content">
+              <p>Check out my repositories:</p>
+              <a href="https://github.com/YOUR_GITHUB" target="_blank">
+                Open GitHub
+              </a>
+            </div>
+          </div>
+
+          <!-- Projects app -->
+          <div id="app-projects" class="app-window" role="dialog" aria-label="Projects">
+            <div class="win-titlebar">
+              <span>Projects</span>
+              <div class="win-titlebar-buttons">
+                <button class="win-btn win-btn-min" data-minimize="projects" aria-label="Minimize"><span>_</span></button>
+                <button class="win-btn win-btn-max" data-maximize="projects" aria-label="Maximize"><span>▢</span></button>
+                <button class="win-btn win-btn-close" data-close="projects" aria-label="Close"><span>X</span></button>
+              </div>
+            </div>
+            <div class="win-content">
+              <ul>
+                <li><strong>3D Cyber Desk Portfolio</strong> – this interactive scene.</li>
+                <li>Project 2 – short description.</li>
+                <li>Project 3 – short description.</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Certifications & Studies app -->
+          <div id="app-certs" class="app-window" role="dialog" aria-label="Certifications & Studies">
+            <div class="win-titlebar">
+              <span>Certifications &amp; Studies</span>
+              <div class="win-titlebar-buttons">
+                <button class="win-btn win-btn-min" data-minimize="certs" aria-label="Minimize"><span>_</span></button>
+                <button class="win-btn win-btn-max" data-maximize="certs" aria-label="Maximize"><span>▢</span></button>
+                <button class="win-btn win-btn-close" data-close="certs" aria-label="Close"><span>X</span></button>
+              </div>
+            </div>
+            <div class="win-content">
+              <h4>Degree</h4>
+              <p>BSc Computer Science – University (Algeria).</p>
+
+              <h4>Certifications</h4>
+              <ul>
+                <li>CompTIA Security+ (year)</li>
+                <li>More certs here…</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Contact Me app -->
+          <div id="app-contact" class="app-window" role="dialog" aria-label="Contact Me">
+            <div class="win-titlebar">
+              <span>Contact Me</span>
+              <div class="win-titlebar-buttons">
+                <button class="win-btn win-btn-min" data-minimize="contact" aria-label="Minimize"><span>_</span></button>
+                <button class="win-btn win-btn-max" data-maximize="contact" aria-label="Maximize"><span>▢</span></button>
+                <button class="win-btn win-btn-close" data-close="contact" aria-label="Close"><span>X</span></button>
+              </div>
+            </div>
+            <div class="win-content">
+              <p>You can reach me directly by email:</p>
+              <p><strong>Email:</strong>
+                <a href="mailto:your.email@example.com">your.email@example.com</a>
+              </p>
+              <p>Or use this quick form:</p>
+              <form action="mailto:your.email@example.com" method="get" enctype="text/plain">
+                <label>
+                  Name:<br />
+                  <input type="text" name="name" />
+                </label><br /><br />
+                <label>
+                  Email:<br />
+                  <input type="email" name="email" />
+                </label><br /><br />
+                <label>
+                  Message:<br />
+                  <textarea name="message" rows="4"></textarea>
+                </label><br /><br />
+                <button type="submit">Send</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- XP-like taskbar at bottom -->
+      <div id="xp-taskbar">
+        <button
+          id="xp-start-button"
+          aria-haspopup="true"
+          aria-expanded="false"
+          aria-label="Start menu"
+        >
+          <span class="xp-start-logo">
+            <img src="/icons/xp_logo.png" alt="XP logo" />
+          </span>
+          <span class="xp-start-text">Start</span>
+        </button>
+
+        <div id="xp-taskbar-area">
+          <!-- Filled dynamically with the current app button -->
+        </div>
+
+        <div id="xp-clock" aria-label="Clock">19:45</div>
+      </div>
+
+      <!-- START MENU POPUP -->
+      <div
+        id="xp-start-menu"
+        role="menu"
+        aria-label="Start menu"
+      >
+        <div class="xp-start-header">
+          <img src="/icons/login.png" alt="User picture" />
+          <span>user</span>
+        </div>
+
+        <div class="xp-start-body">
+          <div class="xp-start-left">
+            <!-- same order as desktop -->
+            <div class="xp-start-app" data-app="certs" role="menuitem" tabindex="0">
+              <img src="/icons/cert.png" alt="" />
+              <span>Certs &amp; Studies</span>
+            </div>
+            <div class="xp-start-app" data-app="projects" role="menuitem" tabindex="0">
+              <img src="/icons/proj.png" alt="" />
+              <span>Projects</span>
+            </div>
+            <div class="xp-start-app" data-app="linkedin" role="menuitem" tabindex="0">
+              <img src="/icons/linkedin_logo.png" alt="" />
+              <span>LinkedIn</span>
+            </div>
+            <div class="xp-start-app" data-app="resume" role="menuitem" tabindex="0">
+              <img src="/icons/cv_logo.png" alt="" />
+              <span>CV</span>
+            </div>
+            <div class="xp-start-app" data-app="contact" role="menuitem" tabindex="0">
+              <img src="/icons/contact_me.png" alt="" />
+              <span>Contact</span>
+            </div>
+            <div class="xp-start-app" data-app="github" role="menuitem" tabindex="0">
+              <img src="/icons/github-logo.png" alt="" />
+              <span>GitHub</span>
+            </div>
+          </div>
+
+          <div class="xp-start-right">
+            <div class="xp-start-right-section">
+              <span class="xp-section-title">Links</span>
+              <span class="xp-section-item">My Documents</span>
+              <span class="xp-section-item">My Pictures</span>
+              <span class="xp-section-item">Control Panel</span>
+            </div>
+
+            <div class="xp-start-right-bottom">
+              <button class="xp-logoff" aria-label="Log Off">
+                <img src="/icons/logoff.png" alt="" />
+              </button>
+              <button class="xp-shutdown" aria-label="Turn Off">
+                <img src="/icons/turnoff.png" alt="" />
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- END START MENU -->
+    </div>
+  </div>
+
+  <script type="module" src="/src/desktopScene.js"></script>
+</body>
+</html>
