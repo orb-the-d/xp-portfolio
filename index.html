@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Djamal — Cybersecurity Portfolio</title>
+  <link rel="stylesheet" href="/src/styles/os.css" />
+</head>
+<body>
+  <!-- ════ INTRO OVERLAY — terminal boot + ACCESS GRANTED + glitch ════ -->
+  <div id="intro-overlay">
+    <div id="intro-term-output"></div>
+    <div id="intro-granted">
+      <div class="intro-granted-text">ACCESS GRANTED</div>
+      <div class="intro-granted-sub">Initializing environment&hellip;</div>
+    </div>
+    <canvas id="intro-glitch-canvas"></canvas>
+  </div>
+
+
+<!-- NAV HINT -->
+<div id="nav-hint">
+  <button class="nav-hint-btn" id="hint-enter">
+    🖥️ Click the monitor <span class="key">↑</span> to enter
+  </button>
+  <button class="nav-hint-btn" id="hint-orbit">
+    🔄 Drag to orbit &nbsp;|&nbsp; <span class="key">←</span><span class="key">→</span> cycle
+  </button>
+</div>
+
+<!-- OS SCREEN -->
+<div id="os-screen">
+
+  <!-- CRT scanline overlay -->
+  <div id="crt-overlay"></div>
+
+  <!-- Boot -->
+  <div id="os-boot-screen">
+    <div class="boot-center">
+      <div class="boot-flag-wrap">
+        <svg class="boot-flag" viewBox="0 0 96 96" xmlns="http://www.w3.org/2000/svg">
+          <path d="M0 13 L44 6 L44 46 L0 46 Z"  fill="#F25022"/>
+          <path d="M48 5 L96 0 L96 46 L48 46 Z"  fill="#7FBA00"/>
+          <path d="M0 50 L44 50 L44 90 L0 83 Z"  fill="#00A4EF"/>
+          <path d="M48 50 L96 50 L96 96 L48 91 Z" fill="#FFB900"/>
+        </svg>
+      </div>
+      <div class="boot-text-wrap">
+        <span class="boot-microsoft">Microsoft&#174;</span>
+        <span class="boot-windows">Windows<em class="boot-tm">&#8482;</em></span>
+        <span class="boot-xp-label"><em>xp</em></span>
+      </div>
+    </div>
+    <div class="boot-bar-wrap">
+      <div class="boot-bar-track">
+        <div class="boot-bar-seg"></div>
+        <div class="boot-bar-seg"></div>
+        <div class="boot-bar-seg"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Login -->
+  <!-- LOGIN SCREEN — exact Windows XP replica -->
+  <div id="xp-login-screen">
+    <div class="xp-login-topbar"></div>
+    <div class="xp-login-main">
+      <div class="xp-login-left">
+        <div class="xp-login-brand">
+          <svg class="xp-brand-flag" viewBox="0 0 96 96" xmlns="http://www.w3.org/2000/svg">
+            <path d="M0 13 L44 6 L44 46 L0 46 Z"  fill="#F25022"/>
+            <path d="M48 5 L96 0 L96 46 L48 46 Z"  fill="#7FBA00"/>
+            <path d="M0 50 L44 50 L44 90 L0 83 Z"  fill="#00A4EF"/>
+            <path d="M48 50 L96 50 L96 96 L48 91 Z" fill="#FFB900"/>
+          </svg>
+          <div class="xp-brand-text">
+            <span class="xp-brand-microsoft">Microsoft&#174;</span>
+            <div class="xp-brand-windows-row">
+              <span class="xp-brand-windows">Windows</span><em class="xp-brand-xp">xp</em>
+            </div>
+          </div>
+        </div>
+        <p class="xp-login-prompt">To begin, click your user name</p>
+      </div>
+      <div class="xp-login-vsep"></div>
+      <div class="xp-login-right">
+        <div id="xp-login-panel">
+          <div id="xp-login-account" role="button" tabindex="0">
+            <div class="login-avatar">DJ</div>
+            <div class="login-text">
+              <div class="login-name">Djamal</div>
+              <div class="login-hint">Portfolio &amp; Projects</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="xp-login-footer">
+      <div class="xp-footer-left">
+        <button class="xp-footer-power">
+          <span class="xp-footer-power-icon">&#9711;</span>
+          Turn off computer
+        </button>
+      </div>
+      <div class="xp-footer-right">
+        After you log on, you can add or change accounts.<br>
+        Just go to Control Panel and click User Accounts.
+      </div>
+    </div>
+  </div>
+
+  <!-- Screensaver -->
+  <div id="xp-screensaver">
+    <canvas id="ss-canvas"></canvas>
+    <div class="ss-hint">Click anywhere to dismiss</div>
+  </div>
+
+  <!-- Shell -->
+  <div id="os-windows">
+    <div id="xp-desktop">
+
+      <!-- Icons -->
+      <div class="xp-icon-column">
+        <div class="xp-icon" data-app="about"    tabindex="0"><div class="xp-icon-img"><img src="/icons/cv_logo.png"       alt=""/></div><span>About Me</span></div>
+        <div class="xp-icon" data-app="certs"    tabindex="0"><div class="xp-icon-img"><img src="/icons/cert.png"          alt=""/></div><span>Certs &amp; Education</span></div>
+        <div class="xp-icon" data-app="projects" tabindex="0"><div class="xp-icon-img"><img src="/icons/proj.png"          alt=""/></div><span>Projects</span></div>
+        <div class="xp-icon" data-app="github"   tabindex="0"><div class="xp-icon-img"><img src="/icons/github-logo.png"   alt=""/></div><span>GitHub</span></div>
+        <div class="xp-icon" data-app="linkedin" tabindex="0"><div class="xp-icon-img"><img src="/icons/linkedin_logo.png" alt=""/></div><span>LinkedIn</span></div>
+        <div class="xp-icon" data-app="contact"  tabindex="0"><div class="xp-icon-img"><img src="/icons/contact_me.png"    alt=""/></div><span>Contact</span></div>
+        <div class="xp-icon" data-app="notepad"  tabindex="0"><div class="xp-icon-img"><img src="/icons/notepad.png"       alt="" onerror="this.src='/icons/cv_logo.png'"/></div><span>Notepad</span></div>
+        <div class="xp-icon" data-app="cmd"      tabindex="0"><div class="xp-icon-img"><img src="/icons/cmd.png"           alt="" onerror="this.src='/icons/proj.png'"/></div><span>Command Prompt</span></div>
+        <div class="xp-icon" data-app="mines"    tabindex="0"><div class="xp-icon-img"><img src="/icons/mines.png"         alt="" onerror="this.src='/icons/cert.png'"/></div><span>Minesweeper</span></div>
+      </div>
+
+      <!-- ════════════ WINDOWS ════════════ -->
+
+      <!-- ABOUT ME -->
+      <div id="app-about" class="app-window" style="top:18px;left:80px;width:445px;height:295px;">
+        <div class="win-titlebar">
+          <div class="win-titlebar-left"><img class="win-titlebar-icon" src="/icons/cv_logo.png" alt=""/><span class="win-titlebar-title">About Me — Djamal</span></div>
+          <div class="win-titlebar-buttons">
+            <button class="win-btn win-btn-min"   data-minimize="about"   ><span style="font-family:Marlett,sans-serif;font-size:11px;">0</span></button>
+            <button class="win-btn win-btn-max"   data-maximize="about"   ><span style="font-family:Marlett,sans-serif;font-size:11px;">1</span></button>
+            <button class="win-btn win-btn-close" data-close="about"      ><span style="font-family:Marlett,sans-serif;font-size:11px;">r</span></button>
+          </div>
+        </div>
+        <div class="win-menubar"><span class="win-menu-item"><u>F</u>ile</span><span class="win-menu-item"><u>V</u>iew</span><span class="win-menu-item"><u>H</u>elp</span></div>
+        <div class="win-body">
+          <div class="win-content">
+            <div class="cv-header">
+              <div class="cv-avatar">DJ</div>
+              <div class="cv-header-info">
+                <h2>Djamal</h2>
+                <p>Cybersecurity Graduate &amp; SOC Analyst Candidate</p>
+                <div class="cv-badges">
+                  <span class="cv-badge">CompTIA Sec+</span>
+                  <span class="cv-badge">Cisco CEH</span>
+                  <span class="cv-badge">BSc CS 2025</span>
+                </div>
+              </div>
+            </div>
+            <div class="cv-section">
+              <h3>Profile</h3>
+              <div class="cv-row"><span class="cv-row-icon">🎯</span><div><div class="cv-row-title">Target Role</div><div class="cv-row-sub">SOC Analyst (Tier 1 / Tier 2) — actively applying</div></div></div>
+              <div class="cv-row"><span class="cv-row-icon">🎓</span><div><div class="cv-row-title">Education</div><div class="cv-row-sub">Bachelor in Computer Science — graduating June 2025</div></div></div>
+              <div class="cv-row"><span class="cv-row-icon">🌍</span><div><div class="cv-row-title">Next Step</div><div class="cv-row-sub">MSc Cybersecurity / CS in Europe — 2025–2026</div></div></div>
+              <div class="cv-row"><span class="cv-row-icon">🛡️</span><div><div class="cv-row-title">Core Skills</div><div class="cv-row-sub">SIEM · Network Monitoring · Threat Analysis · Incident Response · Python</div></div></div>
+            </div>
+            <div class="cv-section" style="padding-top:4px;">
+              <a class="cv-btn" href="/files/My_CV.pdf" target="_blank" rel="noopener">📄 Download CV (PDF)</a>
+            </div>
+          </div>
+          <div class="win-statusbar"><span class="win-statusbar-panel">Ready</span><span>Djamal · Cybersecurity Portfolio</span></div>
+        </div>
+        <div class="win-resize"></div>
+      </div>
+
+      <!-- CERTS -->
+      <div id="app-certs" class="app-window" style="top:28px;left:110px;width:420px;height:270px;">
+        <div class="win-titlebar">
+          <div class="win-titlebar-left"><img class="win-titlebar-icon" src="/icons/cert.png" alt=""/><span class="win-titlebar-title">Certifications &amp; Education</span></div>
+          <div class="win-titlebar-buttons">
+            <button class="win-btn win-btn-min"   data-minimize="certs"  ><span style="font-family:Marlett,sans-serif;font-size:11px;">0</span></button>
+            <button class="win-btn win-btn-max"   data-maximize="certs"  ><span style="font-family:Marlett,sans-serif;font-size:11px;">1</span></button>
+            <button class="win-btn win-btn-close" data-close="certs"     ><span style="font-family:Marlett,sans-serif;font-size:11px;">r</span></button>
+          </div>
+        </div>
+        <div class="win-menubar"><span class="win-menu-item"><u>F</u>ile</span><span class="win-menu-item"><u>V</u>iew</span></div>
+        <div class="win-body">
+          <div class="win-content">
+            <div class="cv-section" style="padding:0 0 6px;">
+              <h3>Certifications</h3>
+              <div class="cert-item"><div class="cert-icon">🔐</div><div class="cert-info"><div class="cert-name">CompTIA Security+</div><div class="cert-org">CompTIA · SY0-701</div><div class="cert-year">Baseline cybersecurity skills for SOC analyst roles</div></div></div>
+              <div class="cert-item"><div class="cert-icon">🌐</div><div class="cert-info"><div class="cert-name">Cisco Ethical Hacker</div><div class="cert-org">Cisco Networking Academy</div><div class="cert-year">Penetration testing fundamentals &amp; ethical hacking methodologies</div></div></div>
+            </div>
+            <div class="cv-section" style="padding:0;">
+              <h3>Education</h3>
+              <div class="cert-item"><div class="cert-icon">🎓</div><div class="cert-info"><div class="cert-name">BSc Computer Science</div><div class="cert-org">University · Algeria — Graduating June 2025</div><div class="cert-year">Focus: Networks, Security, Algorithms</div></div></div>
+              <div class="cert-item" style="border-style:dashed;border-color:#b8d0ec;background:linear-gradient(135deg,#f0f8ff,#e4effc);"><div class="cert-icon" style="background:linear-gradient(135deg,#c8d8f4,#a8c0e8);">🔭</div><div class="cert-info"><div class="cert-name" style="color:#1a4888;">MSc Cybersecurity / CS — Europe</div><div class="cert-org" style="color:#3a68a8;">Applications in progress · 2025–2026</div><div class="cert-year">Target: France, Germany, Netherlands, Belgium</div></div></div>
+            </div>
+          </div>
+          <div class="win-statusbar"><span class="win-statusbar-panel">2 Certifications · 1 Degree</span></div>
+        </div>
+        <div class="win-resize"></div>
+      </div>
+
+      <!-- PROJECTS -->
+      <div id="app-projects" class="app-window" style="top:22px;left:90px;width:430px;height:275px;">
+        <div class="win-titlebar">
+          <div class="win-titlebar-left"><img class="win-titlebar-icon" src="/icons/proj.png" alt=""/><span class="win-titlebar-title">Projects</span></div>
+          <div class="win-titlebar-buttons">
+            <button class="win-btn win-btn-min"   data-minimize="projects"><span style="font-family:Marlett,sans-serif;font-size:11px;">0</span></button>
+            <button class="win-btn win-btn-max"   data-maximize="projects"><span style="font-family:Marlett,sans-serif;font-size:11px;">1</span></button>
+            <button class="win-btn win-btn-close" data-close="projects"   ><span style="font-family:Marlett,sans-serif;font-size:11px;">r</span></button>
+          </div>
+        </div>
+        <div class="win-menubar"><span class="win-menu-item"><u>F</u>ile</span><span class="win-menu-item"><u>V</u>iew</span></div>
+        <div class="win-body">
+          <div class="win-content">
+            <div class="proj-item"><div class="proj-name">🖥️ 3D Cyber Desk Portfolio</div><div class="proj-tags"><span class="proj-tag">Three.js</span><span class="proj-tag">JavaScript</span><span class="proj-tag">Vite</span></div><div class="proj-desc">Interactive Windows XP–inspired portfolio built on a WebGL 3D desk scene. Features bootable OS, draggable windows and smooth camera animation.</div></div>
+            <div class="proj-item"><div class="proj-name">🛡️ Network Intrusion Detection Lab</div><div class="proj-tags"><span class="proj-tag">Snort</span><span class="proj-tag">Wireshark</span><span class="proj-tag">Python</span></div><div class="proj-desc">Home NIDS lab to detect common attack patterns. Custom Snort rules for port scanning, ARP spoofing and brute-force detection.</div></div>
+            <div class="proj-item"><div class="proj-name">🔍 OSINT Automation Tool</div><div class="proj-tags"><span class="proj-tag">Python</span><span class="proj-tag">BeautifulSoup</span><span class="proj-tag">Shodan API</span></div><div class="proj-desc">CLI tool aggregating OSINT on a target domain: WHOIS, DNS records, exposed ports and breach checks.</div></div>
+          </div>
+          <div class="win-statusbar"><span class="win-statusbar-panel">3 objects</span></div>
+        </div>
+        <div class="win-resize"></div>
+      </div>
+
+      <!-- GITHUB -->
+      <div id="app-github" class="app-window" style="top:24px;left:100px;width:390px;height:255px;">
+        <div class="win-titlebar">
+          <div class="win-titlebar-left"><img class="win-titlebar-icon" src="/icons/github-logo.png" alt=""/><span class="win-titlebar-title">GitHub — Djamal's Repos</span></div>
+          <div class="win-titlebar-buttons">
+            <button class="win-btn win-btn-min"   data-minimize="github"><span style="font-family:Marlett,sans-serif;font-size:11px;">0</span></button>
+            <button class="win-btn win-btn-max"   data-maximize="github"><span style="font-family:Marlett,sans-serif;font-size:11px;">1</span></button>
+            <button class="win-btn win-btn-close" data-close="github"   ><span style="font-family:Marlett,sans-serif;font-size:11px;">r</span></button>
+          </div>
+        </div>
+        <div class="win-menubar"><span class="win-menu-item"><u>F</u>ile</span><span class="win-menu-item"><u>E</u>dit</span><span class="win-menu-item"><u>V</u>iew</span><span class="win-menu-item">F<u>a</u>vorites</span></div>
+        <div class="win-toolbar"><span style="font-size:10px;color:#444;white-space:nowrap;">Address:</span><input class="win-toolbar-input" value="https://github.com/YOUR_GITHUB" readonly /></div>
+        <div class="win-body">
+          <div class="win-content" style="padding:4px 0;">
+            <div class="gh-repo"><span class="gh-repo-icon">📁</span><span class="gh-repo-name">xp-portfolio</span><span class="gh-repo-lang">JavaScript</span></div>
+            <div class="gh-repo"><span class="gh-repo-icon">📁</span><span class="gh-repo-name">nids-lab</span><span class="gh-repo-lang">Python</span></div>
+            <div class="gh-repo"><span class="gh-repo-icon">📁</span><span class="gh-repo-name">osint-tool</span><span class="gh-repo-lang">Python</span></div>
+            <div class="gh-repo"><span class="gh-repo-icon">📁</span><span class="gh-repo-name">ctf-writeups</span><span class="gh-repo-lang">Markdown</span></div>
+            <div style="padding:8px 10px;"><a class="cv-btn" href="https://github.com/YOUR_GITHUB" target="_blank" rel="noopener">🔗 Open GitHub Profile</a></div>
+          </div>
+          <div class="win-statusbar"><span class="win-statusbar-panel">4 objects</span></div>
+        </div>
+        <div class="win-resize"></div>
+      </div>
+
+      <!-- LINKEDIN -->
+      <div id="app-linkedin" class="app-window" style="top:20px;left:95px;width:380px;height:245px;">
+        <div class="win-titlebar">
+          <div class="win-titlebar-left"><img class="win-titlebar-icon" src="/icons/linkedin_logo.png" alt=""/><span class="win-titlebar-title">LinkedIn Profile</span></div>
+          <div class="win-titlebar-buttons">
+            <button class="win-btn win-btn-min"   data-minimize="linkedin"><span style="font-family:Marlett,sans-serif;font-size:11px;">0</span></button>
+            <button class="win-btn win-btn-max"   data-maximize="linkedin"><span style="font-family:Marlett,sans-serif;font-size:11px;">1</span></button>
+            <button class="win-btn win-btn-close" data-close="linkedin"   ><span style="font-family:Marlett,sans-serif;font-size:11px;">r</span></button>
+          </div>
+        </div>
+        <div class="win-menubar"><span class="win-menu-item"><u>F</u>ile</span><span class="win-menu-item"><u>V</u>iew</span></div>
+        <div class="win-body">
+          <div class="win-content">
+            <div class="li-card"><div class="li-avatar">DJ</div><div><div class="li-name">Djamal</div><div class="li-title">Cybersecurity Student · BSc CS · CompTIA Sec+ · Cisco EH</div><div class="li-stats"><div class="li-stat"><span class="li-stat-num">2</span><span>Certs</span></div><div class="li-stat"><span class="li-stat-num">SOC</span><span>Target</span></div><div class="li-stat"><span class="li-stat-num">MSc</span><span>Planned</span></div></div></div></div>
+            <p style="font-size:11px;color:#444;margin:0 0 8px;">Open to SOC Analyst opportunities and MSc programmes in Europe.</p>
+            <a class="cv-btn" href="https://www.linkedin.com/in/YOUR_HANDLE" target="_blank" rel="noopener">🔗 Open LinkedIn Profile</a>
+          </div>
+          <div class="win-statusbar"><span class="win-statusbar-panel">linkedin.com/in/YOUR_HANDLE</span></div>
+        </div>
+        <div class="win-resize"></div>
+      </div>
+
+      <!-- CONTACT -->
+      <div id="app-contact" class="app-window" style="top:18px;left:85px;width:360px;height:275px;">
+        <div class="win-titlebar">
+          <div class="win-titlebar-left"><img class="win-titlebar-icon" src="/icons/contact_me.png" alt=""/><span class="win-titlebar-title">Contact Me</span></div>
+          <div class="win-titlebar-buttons">
+            <button class="win-btn win-btn-min"   data-minimize="contact"><span style="font-family:Marlett,sans-serif;font-size:11px;">0</span></button>
+            <button class="win-btn win-btn-max"   data-maximize="contact"><span style="font-family:Marlett,sans-serif;font-size:11px;">1</span></button>
+            <button class="win-btn win-btn-close" data-close="contact"   ><span style="font-family:Marlett,sans-serif;font-size:11px;">r</span></button>
+          </div>
+        </div>
+        <div class="win-menubar"><span class="win-menu-item"><u>F</u>ile</span><span class="win-menu-item"><u>V</u>iew</span></div>
+        <div class="win-body">
+          <div class="win-content">
+            <div class="cv-row" style="border:none;padding-bottom:6px;"><span class="cv-row-icon">📧</span><div><div class="cv-row-title">Email</div><a href="mailto:your.email@example.com" style="font-size:11px;color:#0050c8;">your.email@example.com</a></div></div>
+            <div class="contact-field"><label for="cf-name">Name</label><input type="text" id="cf-name" placeholder="Your name"/></div>
+            <div class="contact-field"><label for="cf-email">Email</label><input type="email" id="cf-email" placeholder="your@email.com"/></div>
+            <div class="contact-field"><label for="cf-msg">Message</label><textarea id="cf-msg" rows="3" placeholder="Write your message here…"></textarea></div>
+            <button class="cv-btn" id="cf-send">📨 Send Message</button>
+          </div>
+          <div class="win-statusbar" id="cf-status"><span class="win-statusbar-panel">Ready</span></div>
+        </div>
+        <div class="win-resize"></div>
+      </div>
+
+      <!-- NOTEPAD -->
+      <div id="app-notepad" class="app-window" style="top:24px;left:88px;width:420px;height:268px;">
+        <div class="win-titlebar">
+          <div class="win-titlebar-left"><img class="win-titlebar-icon" src="/icons/notepad.png" alt="" onerror="this.src='/icons/cv_logo.png'"/><span class="win-titlebar-title">README.txt — Notepad</span></div>
+          <div class="win-titlebar-buttons">
+            <button class="win-btn win-btn-min"   data-minimize="notepad"><span style="font-family:Marlett,sans-serif;font-size:11px;">0</span></button>
+            <button class="win-btn win-btn-max"   data-maximize="notepad"><span style="font-family:Marlett,sans-serif;font-size:11px;">1</span></button>
+            <button class="win-btn win-btn-close" data-close="notepad"   ><span style="font-family:Marlett,sans-serif;font-size:11px;">r</span></button>
+          </div>
+        </div>
+        <div class="win-menubar"><span class="win-menu-item"><u>F</u>ile</span><span class="win-menu-item"><u>E</u>dit</span><span class="win-menu-item">F<u>o</u>rmat</span><span class="win-menu-item"><u>V</u>iew</span></div>
+        <div class="win-body">
+          <textarea id="notepad-area" class="notepad-area" spellcheck="false" readonly></textarea>
+        </div>
+      </div>
+
+      <!-- CMD -->
+      <div id="app-cmd" class="app-window cmd-window" style="top:26px;left:92px;width:450px;height:268px;">
+        <div class="win-titlebar cmd-titlebar">
+          <div class="win-titlebar-left"><span class="win-titlebar-title">C:\WINDOWS\system32\cmd.exe</span></div>
+          <div class="win-titlebar-buttons">
+            <button class="win-btn win-btn-min"   data-minimize="cmd"><span style="font-family:Marlett,sans-serif;font-size:11px;">0</span></button>
+            <button class="win-btn win-btn-max"   data-maximize="cmd"><span style="font-family:Marlett,sans-serif;font-size:11px;">1</span></button>
+            <button class="win-btn win-btn-close" data-close="cmd"   ><span style="font-family:Marlett,sans-serif;font-size:11px;">r</span></button>
+          </div>
+        </div>
+        <div class="win-body cmd-body">
+          <div id="cmd-output" class="cmd-output"></div>
+        </div>
+        <div class="win-resize"></div>
+      </div>
+
+      <!-- MINESWEEPER -->
+      <div id="app-mines" class="app-window" style="top:20px;left:88px;width:260px;height:310px;">
+        <div class="win-titlebar">
+          <div class="win-titlebar-left"><img class="win-titlebar-icon" src="/icons/mines.png" alt="" onerror="this.src='/icons/cert.png'"/><span class="win-titlebar-title">Minesweeper</span></div>
+          <div class="win-titlebar-buttons">
+            <button class="win-btn win-btn-min"   data-minimize="mines"><span style="font-family:Marlett,sans-serif;font-size:11px;">0</span></button>
+            <button class="win-btn win-btn-max"   data-maximize="mines"><span style="font-family:Marlett,sans-serif;font-size:11px;">1</span></button>
+            <button class="win-btn win-btn-close" data-close="mines"   ><span style="font-family:Marlett,sans-serif;font-size:11px;">r</span></button>
+          </div>
+        </div>
+        <div class="win-menubar"><span class="win-menu-item"><u>G</u>ame</span><span class="win-menu-item"><u>H</u>elp</span></div>
+        <div class="win-body">
+          <div class="mines-ui">
+            <div class="mines-header">
+              <div id="mines-count" class="mines-lcd">010</div>
+              <button id="mines-face" class="mines-face">🙂</button>
+              <div id="mines-time"  class="mines-lcd">000</div>
+            </div>
+            <div id="mines-board"></div>
+          </div>
+        </div>
+        <div class="win-resize"></div>
+      </div>
+
+      <!-- ERROR DIALOG -->
+      <div id="xp-error-dialog" class="app-window error-dialog" style="width:360px;height:auto;top:80px;left:120px;">
+        <div class="win-titlebar error-titlebar">
+          <div class="win-titlebar-left">
+            <img class="win-titlebar-icon" src="/icons/proj.png" alt="" onerror="this.style.display='none'" style="filter:grayscale(1)"/>
+            <span class="win-titlebar-title">Security Alert</span>
+          </div>
+          <div class="win-titlebar-buttons">
+            <button class="win-btn win-btn-close" id="xp-error-ok"><span style="font-family:Marlett,sans-serif;font-size:11px;">r</span></button>
+          </div>
+        </div>
+        <div class="error-body">
+          <div class="error-icon">⚠️</div>
+          <div class="error-text">
+            <div class="error-title">Intrusion Attempt Detected</div>
+            <div class="error-msg">1,337 unauthorized access attempts blocked on port 22.<br>Threat actor: <b>Unknown · Origin: 185.220.101.x</b><br><br>SIEM alert triggered. Incident response initiated.</div>
+          </div>
+        </div>
+        <div class="error-footer">
+          <button class="cv-btn" id="xp-error-ok" style="min-width:80px;">OK</button>
+        </div>
+      </div>
+
+      <!-- Context menu -->
+      <div id="xp-context-menu">
+        <div class="ctx-item" data-ctx="refresh">Refresh</div>
+        <div class="ctx-sep"></div>
+        <div class="ctx-item" data-ctx="arrange">Arrange Icons By</div>
+        <div class="ctx-sep"></div>
+        <div class="ctx-item" data-ctx="properties">Properties</div>
+      </div>
+
+      <div id="drag-overlay"></div>
+    </div><!-- /#xp-desktop -->
+
+    <!-- TASKBAR -->
+    <div id="xp-taskbar">
+      <button id="xp-start-button" aria-haspopup="true" aria-expanded="false">
+        <span class="xp-start-logo"><img src="/icons/xp_logo.png" alt="" onerror="this.style.display='none'"/></span>
+        <span class="xp-start-text">start</span>
+      </button>
+      <div style="width:1px;height:22px;background:rgba(0,0,0,0.3);box-shadow:1px 0 0 rgba(255,255,255,0.2);flex-shrink:0;margin:0 4px;"></div>
+      <div id="xp-taskbar-area"></div>
+      <div id="xp-tray">
+        <div id="xp-clock"><span class="clock-time">--:--</span><span class="clock-date">-- ---</span></div>
+      </div>
+    </div>
+
+    <!-- START MENU -->
+    <div id="xp-start-menu" role="menu">
+      <div class="xp-start-header">
+        <img src="/icons/login.png" alt="" onerror="this.style.display='none'"/>
+        <div class="xp-start-header-text">
+          <span class="xp-start-header-name">Djamal</span>
+          <span class="xp-start-header-sub">Cybersecurity Graduate</span>
+        </div>
+      </div>
+      <div class="xp-start-body">
+        <div class="xp-start-left">
+          <div class="xp-start-app" data-app="about"    tabindex="0"><img src="/icons/cv_logo.png"       alt=""/><div class="xp-start-app-texts"><span class="app-name">About Me</span><span class="app-sub">Profile &amp; CV</span></div></div>
+          <div class="xp-start-app" data-app="certs"    tabindex="0"><img src="/icons/cert.png"           alt=""/><div class="xp-start-app-texts"><span class="app-name">Certs &amp; Education</span><span class="app-sub">CompTIA · Cisco · BSc</span></div></div>
+          <div class="xp-start-app" data-app="notepad"  tabindex="0"><img src="/icons/notepad.png"        alt="" onerror="this.src='/icons/cv_logo.png'"/><div class="xp-start-app-texts"><span class="app-name">Notepad</span><span class="app-sub">README.txt</span></div></div>
+          <div class="xp-start-sep"></div>
+          <div class="xp-start-app" data-app="projects" tabindex="0"><img src="/icons/proj.png"           alt=""/><div class="xp-start-app-texts"><span class="app-name">Projects</span><span class="app-sub">Portfolio work</span></div></div>
+          <div class="xp-start-app" data-app="cmd"      tabindex="0"><img src="/icons/cmd.png"            alt="" onerror="this.src='/icons/proj.png'"/><div class="xp-start-app-texts"><span class="app-name">Command Prompt</span><span class="app-sub">Hacking terminal</span></div></div>
+          <div class="xp-start-app" data-app="mines"    tabindex="0"><img src="/icons/mines.png"          alt="" onerror="this.src='/icons/cert.png'"/><div class="xp-start-app-texts"><span class="app-name">Minesweeper</span><span class="app-sub">Take a break</span></div></div>
+        </div>
+        <div class="xp-start-right">
+          <div class="xp-start-right-section">
+            <div class="xp-section-title">My Portfolio</div>
+            <div class="xp-section-link" data-app="about">My Profile</div>
+            <div class="xp-section-link" data-app="certs">My Certs</div>
+            <div class="xp-section-link" data-app="projects">Projects</div>
+          </div>
+          <div class="xp-start-right-section">
+            <div class="xp-section-title">Connect</div>
+            <div class="xp-section-link" data-app="github">GitHub</div>
+            <div class="xp-section-link" data-app="linkedin">LinkedIn</div>
+            <div class="xp-section-link" data-app="contact">Contact</div>
+          </div>
+        </div>
+      </div>
+      <div class="xp-start-bottom">
+        <button class="xp-logoff"><img src="/icons/logoff.png" alt="" onerror="this.style.display='none'"/>Log Off</button>
+        <button class="xp-shutdown"><img src="/icons/turnoff.png" alt="" onerror="this.style.display='none'"/>Turn Off Computer</button>
+      </div>
+    </div>
+
+  </div><!-- /#os-windows -->
+</div><!-- /#os-screen -->
+
+<script type="module" src="/src/desktopScene.js"></script>
+
+  <!-- ════════════ ONBOARDING OVERLAY ════════════ -->
+  <div id="onboarding-overlay">
+    <div class="ob-step" id="ob-step-1">
+      <div class="ob-card ob-anim">
+        <div class="ob-title">👋 Hey — welcome to my <span>portfolio</span>.</div>
+        <div class="ob-body">I'm <b>Djamal</b> — a Cybersecurity graduate and SOC Analyst candidate.<br><br>This portfolio runs inside a <b>3D Windows XP environment</b>.<br>Let me give you a quick tour.</div>
+        <div class="ob-btns">
+          <button class="ob-btn ob-btn-primary" id="ob-start">Show me around →</button>
+          <button class="ob-btn ob-btn-secondary" id="ob-skip-all">Skip tour</button>
+        </div>
+      </div>
+    </div>
+    <div class="ob-step" id="ob-step-2">
+      <div class="ob-card">
+        <div class="ob-badge"><span class="ob-badge-dot"></span>Step 1 of 4</div>
+        <div class="ob-title">🖥️ The <span>3D Scene</span></div>
+        <div class="ob-body"><b>Drag</b> to orbit · <b>Scroll</b> to zoom.<br>Press <span class="ob-key">↑</span> or click the monitor to enter the OS.</div>
+        <div class="ob-dots"><div class="ob-dot active"></div><div class="ob-dot"></div><div class="ob-dot"></div><div class="ob-dot"></div></div>
+        <div class="ob-btns"><button class="ob-btn ob-btn-secondary ob-next" data-next="3">Next →</button></div>
+      </div>
+    </div>
+    <div class="ob-step" id="ob-step-3">
+      <div class="ob-card">
+        <div class="ob-badge"><span class="ob-badge-dot"></span>Step 2 of 4</div>
+        <div class="ob-title">🪟 The <span>XP Desktop</span></div>
+        <div class="ob-body">A full Windows XP desktop with draggable windows — About Me, Certs, Projects, Contact, CMD, Minesweeper.</div>
+        <div class="ob-dots"><div class="ob-dot"></div><div class="ob-dot active"></div><div class="ob-dot"></div><div class="ob-dot"></div></div>
+        <div class="ob-btns"><button class="ob-btn ob-btn-secondary ob-next" data-next="4">Next →</button></div>
+      </div>
+    </div>
+    <div class="ob-step" id="ob-step-4">
+      <div class="ob-card">
+        <div class="ob-badge"><span class="ob-badge-dot"></span>Step 3 of 4</div>
+        <div class="ob-title">⌨️ <span>Controls</span></div>
+        <div class="ob-body"><span class="ob-key">↑</span> Enter monitor &nbsp;·&nbsp; <span class="ob-key">↓</span> Step back &nbsp;·&nbsp; <span class="ob-key">Esc</span> Exit<br><span class="ob-key">←</span><span class="ob-key">→</span> Cycle 3D views · Double-click icons to open.</div>
+        <div class="ob-dots"><div class="ob-dot"></div><div class="ob-dot"></div><div class="ob-dot active"></div><div class="ob-dot"></div></div>
+        <div class="ob-btns"><button class="ob-btn ob-btn-secondary ob-next" data-next="5">Next →</button></div>
+      </div>
+    </div>
+    <div class="ob-step" id="ob-step-5">
+      <div class="ob-card">
+        <div class="ob-badge"><span class="ob-badge-dot"></span>Step 4 of 4</div>
+        <div class="ob-title">📄 Find my <span>CV</span></div>
+        <div class="ob-body">Open <b>About Me</b> on the desktop to download my CV.<br>I'm looking for <b>SOC Analyst</b> roles &amp; MSc opportunities in Europe 🇪🇺</div>
+        <div class="ob-dots"><div class="ob-dot"></div><div class="ob-dot"></div><div class="ob-dot"></div><div class="ob-dot active"></div></div>
+        <div class="ob-btns"><button class="ob-btn ob-btn-secondary ob-next" data-next="6">Next →</button></div>
+      </div>
+    </div>
+    <div class="ob-step" id="ob-step-6">
+      <div class="ob-card">
+        <div class="ob-badge"><span class="ob-badge-dot"></span>One more thing</div>
+        <div class="ob-title">👾 Leave it <span>idle</span>…</div>
+        <div class="ob-body">Leave the desktop untouched for <b>7 seconds</b> — a hacker screensaver kicks in.</div>
+        <div class="ob-matrix-wrap"><canvas id="ob-matrix-canvas"></canvas></div>
+        <div class="ob-btns" style="margin-top:14px;"><button class="ob-btn ob-btn-primary" id="ob-finish">Let's go 🚀</button></div>
+      </div>
+    </div>
+  </div><!-- /#onboarding-overlay -->
+
+</body>
+</html>

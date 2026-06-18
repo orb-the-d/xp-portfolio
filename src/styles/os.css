@@ -1,0 +1,2044 @@
+/* =====================================================================
+   DJAMAL — WINDOWS XP LUNA  (pixel-accurate recreation)
+   Reference: Windows_XP_Luna.png
+   ===================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Tahoma:wght@400;700&display=swap');
+
+/* ── XP Luna color tokens (sampled from screenshot) ──────────────── */
+:root {
+  /* Titlebar gradient: bright cornflower → royal blue */
+  --xp-title-top:        #4f9cf5;
+  --xp-title-mid:        #1b5fb5;
+  --xp-title-bot:        #1351a8;
+  --xp-title-shine:      #6eb4f7;   /* very top highlight stripe */
+  --xp-title-inactive:   #7a96c2;   /* inactive window titlebar */
+
+  /* Window chrome */
+  --xp-window-bg:        #ece9d8;   /* classic XP tan / grey */
+  --xp-border-outer:     #0a246a;   /* dark outer frame */
+  --xp-border-inner:     #a0b8d8;   /* inner bevel light */
+
+  /* Taskbar */
+  --xp-tb-top:           #245edb;
+  --xp-tb-bot:           #1344b4;
+  --xp-tb-shine:         rgba(255,255,255,0.45);
+  --xp-tb-border:        #1632a0;
+
+  /* Start button */
+  --xp-start-top:        #5ac857;
+  --xp-start-bot:        #268a24;
+  --xp-start-border:     #1c6c1a;
+  --xp-start-shine:      rgba(255,255,255,0.55);
+
+  /* Caption buttons */
+  --xp-cap-bg-top:       #5ea8e8;
+  --xp-cap-bg-bot:       #2868c0;
+  --xp-cap-close-top:    #e87060;
+  --xp-cap-close-bot:    #c02018;
+  --xp-cap-border:       rgba(0,0,0,0.5);
+
+  /* Highlight / selection */
+  --xp-select:           #316ac5;
+
+  /* Menus */
+  --xp-start-left:       #ffffff;
+  --xp-start-right:      #d3e5fa;
+  --xp-start-header-top: #0f3f9a;
+  --xp-start-header-bot: #0a2870;
+  --xp-start-footer-top: #1344b4;
+  --xp-start-footer-bot: #0a2870;
+
+  --xp-font: 'Tahoma', 'MS Sans Serif', Arial, sans-serif;
+}
+
+/* ── Reset ───────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  overflow: hidden;
+  font-family: var(--xp-font);
+  font-size: 11px;
+  cursor: default;
+  user-select: none;
+}
+
+canvas { display: block; }
+
+/* ═══════════════════════════════════════════════════════════════════
+   NAV HINT OVERLAY
+═══════════════════════════════════════════════════════════════════ */
+#nav-hint {
+  position: fixed;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 12px;
+  z-index: 1000;
+  pointer-events: none;
+  transition: opacity 0.5s;
+}
+#nav-hint.hidden { opacity: 0; pointer-events: none; }
+
+.nav-hint-btn {
+  background: rgba(0,0,0,0.65);
+  color: #fff;
+  border: 1px solid rgba(255,255,255,0.28);
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 12px;
+  font-family: var(--xp-font);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  backdrop-filter: blur(8px);
+  white-space: nowrap;
+  pointer-events: all;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.15s;
+}
+.nav-hint-btn:hover { background: rgba(30,70,190,0.75); transform: translateY(-2px); }
+.nav-hint-btn .key {
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.4);
+  border-radius: 4px;
+  padding: 1px 7px;
+  font-size: 11px;
+  font-weight: bold;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   OS SCREEN — overlay on top of 3D monitor
+   IMPORTANT: width/height must exactly match the monitor texture area.
+   These are calibration values — tweak top/left/width/height until
+   the OS sits perfectly inside the bezel.
+═══════════════════════════════════════════════════════════════════ */
+#os-screen {
+  position: fixed;
+  /* ── Calibrate these four values to your GLB monitor bezel ── */
+  width:  81vw;
+  height: 81vh;
+  top:     6vh;
+  left:   7.5vw;
+  /* ─────────────────────────────────────────────────────────── */
+  display: none;
+  overflow: hidden;
+  background: #000;
+  /* Subtle CRT inner glow + outer dark bezel shadow */
+  box-shadow:
+    inset 0 0 6px rgba(0,0,0,0.6),
+    0 0 0 2px #111,
+    0 0 20px rgba(0,0,0,0.9);
+  border-radius: 1px;
+  image-rendering: crisp-edges;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   BOOT SCREEN
+═══════════════════════════════════════════════════════════════════ */
+#os-boot-screen {
+  position: absolute;
+  inset: 0;
+  background: #000 url('/xp-boot1.png') center/cover no-repeat;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  padding-bottom: 24px;
+}
+.boot-bar-wrap { display: flex; gap: 3px; }
+.boot-bar-seg {
+  width: 13px; height: 9px;
+  background: #3a6ea5;
+  border-radius: 2px;
+  opacity: 0;
+  animation: bootPulse 1.5s ease-in-out infinite;
+}
+.boot-bar-seg:nth-child(1){animation-delay:0.00s}
+.boot-bar-seg:nth-child(2){animation-delay:0.20s}
+.boot-bar-seg:nth-child(3){animation-delay:0.40s}
+.boot-bar-seg:nth-child(4){animation-delay:0.60s}
+.boot-bar-seg:nth-child(5){animation-delay:0.80s}
+@keyframes bootPulse {
+  0%,100% { opacity: 0.12; }
+  50%      { opacity: 1;    }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   LOGIN SCREEN
+═══════════════════════════════════════════════════════════════════ */
+/* ── LOGIN SCREEN — Exact Windows XP replica ── */
+
+#xp-login-screen {
+  position: absolute;
+  inset: 0;
+  z-index: 7000;
+  display: none;
+  flex-direction: column;
+  overflow: hidden;
+  font-family: Tahoma, Arial, sans-serif;
+}
+#xp-login-screen[style*="display: flex"],
+#xp-login-screen[style*="display:flex"] { display: flex !important; }
+
+/* ── TOP DARK BAR — full width ── */
+.xp-login-topbar {
+  width: 100%;
+  flex-shrink: 0;
+  height: 8%;
+  min-height: 30px;
+  max-height: 50px;
+  background: linear-gradient(180deg, #1a2ea0 0%, #1e38b8 40%, #182898 100%);
+  border-bottom: 2px solid #0e1e70;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.55);
+  z-index: 2;
+  position: relative;
+}
+
+/* ── MAIN BODY — fills 100% width, no inner box ── */
+.xp-login-main {
+  flex: 1;
+  display: flex;
+  width: 100%;
+  min-height: 0;
+  /* Single uniform blue that fills edge-to-edge.
+     Radial glow only on the LEFT side — exactly like Image 2 */
+  background:
+    radial-gradient(ellipse at 14% 34%,
+      rgba(185,210,255,0.55) 0%,
+      rgba(140,175,245,0.20) 28%,
+      transparent 58%),
+    #4a6ac0;
+}
+
+/* ── LEFT HALF: logo pushed to lower-center ── */
+.xp-login-left {
+  /* exactly 50% width — the divider sits at the exact midpoint */
+  flex: 0 0 50%;
+  width: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  /* nudge content slightly below true center, matching real XP */
+  padding-top: 8%;
+  gap: 14px;
+}
+
+.xp-login-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Windows 4-colour flag */
+.xp-brand-flag {
+  width: 50px;
+  height: 50px;
+  flex-shrink: 0;
+}
+
+.xp-brand-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1;
+}
+
+/* "Microsoft®" — tiny italic serif */
+.xp-brand-microsoft {
+  font-family: 'Times New Roman', Times, serif;
+  font-size: 9px;
+  font-style: italic;
+  color: rgba(255,255,255,0.92);
+  letter-spacing: 0.1px;
+  display: block;
+  margin-bottom: 0;
+}
+
+/* "Windows xp" on one baseline row */
+.xp-brand-windows-row {
+  display: flex;
+  align-items: baseline;
+}
+.xp-brand-windows {
+  font-family: 'Times New Roman', Times, serif;
+  font-size: 30px;
+  font-weight: normal;
+  font-style: italic;
+  color: #fff;
+  line-height: 1;
+  letter-spacing: -0.2px;
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.28);
+}
+.xp-brand-xp {
+  font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+  font-size: 26px;
+  font-style: italic;
+  font-weight: bold;
+  color: #ff9500;
+  margin-left: 4px;
+  letter-spacing: -0.5px;
+  line-height: 1;
+}
+
+/* "To begin, click your user name" */
+.xp-login-prompt {
+  font-family: Tahoma, Arial, sans-serif;
+  font-size: 13px;
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.35);
+  margin: 0;
+  text-align: center;
+  font-weight: normal;
+}
+
+/* ── VERTICAL DIVIDER — 1px, full height, no margin ── */
+.xp-login-vsep {
+  width: 1px;
+  flex-shrink: 0;
+  align-self: stretch;
+  background: linear-gradient(180deg,
+    transparent 0%,
+    rgba(255,255,255,0.5) 3%,
+    rgba(255,255,255,0.5) 97%,
+    transparent 100%);
+}
+
+/* ── RIGHT HALF: user tile — horizontally centred, slightly above center ── */
+.xp-login-right {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  /* push tile slightly above center, matching real XP vertical position */
+  padding-bottom: 2%;
+  /* left padding gives breathing room away from divider */
+  padding-left: 6%;
+  padding-top: 8%;
+}
+
+#xp-login-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+/* ── USER TILE — horizontal pill exactly like real XP ──
+   Image 2: photo on left, bold name + subtitle on right,
+   blue-tinted box with soft border, NOT a vertical card  */
+#xp-login-account {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 16px 6px 6px;
+  border-radius: 3px;
+  background: rgba(70,110,220,0.38);
+  border: 1px solid rgba(160,200,255,0.45);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.12), 0 1px 5px rgba(0,0,0,0.22);
+  cursor: pointer;
+  color: #fff;
+  transition: background 0.1s, border-color 0.1s;
+  min-width: 200px;
+  /* override any stale values */
+  position: static !important;
+  width: auto !important;
+  height: auto !important;
+  filter: none !important;
+}
+#xp-login-account:hover {
+  background: rgba(90,140,240,0.52);
+  border-color: rgba(190,220,255,0.6);
+  filter: none !important;
+}
+
+/* Small square photo thumbnail — like real XP */
+.login-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 2px;
+  background: linear-gradient(135deg, #4a88cc, #1a4898);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: bold;
+  color: #fff;
+  border: 1px solid rgba(255,255,255,0.55);
+  flex-shrink: 0;
+  overflow: hidden;
+}
+.login-avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+.login-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.login-name {
+  font-size: 13px;
+  font-weight: bold;
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.35);
+  line-height: 1.25;
+}
+.login-hint {
+  font-size: 10px;
+  color: rgba(255,255,255,0.78);
+  line-height: 1.25;
+}
+
+/* ── BOTTOM DARK BAR — full width, mirrors top ── */
+.xp-login-footer {
+  width: 100%;
+  flex-shrink: 0;
+  height: 10%;
+  min-height: 36px;
+  max-height: 56px;
+  background: linear-gradient(180deg, #162690 0%, #1a2ea0 60%, #162690 100%);
+  border-top: 2px solid #0e1e70;
+  box-shadow: 0 -3px 8px rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px 0 8px;
+  z-index: 2;
+  position: relative;
+}
+
+.xp-footer-left { display: flex; align-items: center; }
+
+/* "Turn off computer" button */
+.xp-footer-power {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  background: none;
+  border: none;
+  color: #fff;
+  font-family: Tahoma, Arial, sans-serif;
+  font-size: 11px;
+  cursor: pointer;
+  padding: 3px 8px 3px 4px;
+  border-radius: 3px;
+  letter-spacing: 0.1px;
+  transition: background 0.1s;
+}
+.xp-footer-power:hover { background: rgba(255,255,255,0.1); }
+
+/* Orange rounded-square icon — real XP style */
+.xp-footer-power-icon {
+  width: 22px;
+  height: 22px;
+  border-radius: 4px;
+  background: radial-gradient(circle at 44% 33%, #ff8828, #d64000);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: 1px solid rgba(255,255,255,0.22);
+  box-shadow: 0 0 6px rgba(210,70,0,0.75), inset 0 1px 0 rgba(255,255,255,0.2);
+  font-size: 11px;
+  color: rgba(255,255,255,0.95);
+  line-height: 1;
+}
+
+/* Right-side hint text */
+.xp-footer-right {
+  font-family: Tahoma, Arial, sans-serif;
+  font-size: 10px;
+  color: rgba(255,255,255,0.65);
+  text-align: right;
+  line-height: 1.55;
+}
+/* ═══════════════════════════════════════════════════════════════════
+   SHELL STRUCTURE
+═══════════════════════════════════════════════════════════════════ */
+#os-windows {
+  position: relative;
+  z-index: 1;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Desktop ──────────────────────────────────────────────────────── */
+#xp-desktop {
+  position: relative;
+  flex: 1;
+  background: #004e98 url('/xp-wallpaper.jpg') center/cover no-repeat;
+  overflow: hidden;
+}
+
+/* ── Desktop icons ────────────────────────────────────────────────── */
+.xp-icon-column {
+  position: absolute;
+  top: 8px; left: 6px;
+  display: grid;
+  grid-auto-flow: column;
+  grid-template-rows: repeat(5, auto);
+  grid-auto-columns: 72px;
+  row-gap: 2px;
+  column-gap: 6px;
+}
+.xp-icon {
+  width: 72px;
+  text-align: center;
+  color: #fff;
+  font-size: 11px;
+  font-family: var(--xp-font);
+  text-shadow: 1px 1px 2px #000, 0 0 4px #000;
+  cursor: default;
+  padding: 3px 2px 4px;
+  border: 1px solid transparent;
+  border-radius: 2px;
+}
+.xp-icon:hover {
+  background: rgba(49,106,197,0.3);
+  border-color: rgba(49,106,197,0.55);
+}
+.xp-icon.selected, .xp-icon:focus-visible {
+  outline: none;
+  background: rgba(49,106,197,0.5);
+  border-color: rgba(160,200,255,0.8);
+}
+.xp-icon-img {
+  width: 32px; height: 32px;
+  margin: 0 auto 2px;
+}
+.xp-icon-img img {
+  width: 100%; height: 100%;
+  object-fit: contain;
+  image-rendering: pixelated;
+  filter: drop-shadow(1px 2px 2px rgba(0,0,0,0.8));
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   TASKBAR  — exact Luna colours
+   Top highlight stripe, two-stop gradient, bottom border
+═══════════════════════════════════════════════════════════════════ */
+#xp-taskbar {
+  position: relative;
+  height: 30px;
+  /* XP taskbar: bright blue on top, darker at bottom */
+  background: linear-gradient(180deg,
+    #1f6fd4  0%,
+    #1a5ec8  8%,
+    #1651bc 92%,
+    #103aa0 100%);
+  /* thin bright rule on top edge */
+  border-top: 1px solid #5598e8;
+  display: flex;
+  align-items: center;
+  gap: 0;
+  overflow: hidden;
+  flex-shrink: 0;
+  z-index: 30;
+}
+/* Left-side vertical sheen */
+#xp-taskbar::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg,
+    rgba(255,255,255,0.18) 0%,
+    rgba(255,255,255,0.04) 30%,
+    transparent 50%);
+  pointer-events: none;
+}
+
+/* ── Start button (XP Luna exact shape) ──────────────────────────── */
+/*  Large pill that overflows top & bottom of taskbar, rounded only right */
+#xp-start-button {
+  position: relative;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  /* pill: left is flush with taskbar left edge */
+  padding: 0 16px 0 10px;
+  height: 36px;           /* taller than taskbar → overflows */
+  margin-top: -3px;
+  margin-bottom: -3px;
+  margin-left: 0;
+
+  /* Luna green: bright lime top → mid-green bottom */
+  background: linear-gradient(180deg,
+    #6ece6e  0%,
+    #4ab84a  10%,
+    #21a021  50%,
+    #1e8c1e  51%,
+    #187818  100%);
+  color: #fff;
+  font-family: var(--xp-font);
+  font-weight: bold;
+  font-size: 13px;
+  font-style: italic;       /* XP start button text IS italic */
+  letter-spacing: 0.2px;
+  text-shadow: 0 1px 1px rgba(0,0,0,0.6);
+
+  /* Right side only is rounded (big pill radius) */
+  border-radius: 0 12px 12px 0;
+
+  /* Outer dark stroke + top shine inset */
+  border: 1px solid #0e5c0e;
+  border-left: none;
+  box-shadow:
+    inset 0  1px 0 rgba(255,255,255,0.6),  /* top shine */
+    inset 0 -1px 0 rgba(0,0,0,0.3),
+    1px  0  3px rgba(0,0,0,0.5);
+
+  cursor: pointer;
+  transition: filter 0.08s;
+  white-space: nowrap;
+}
+#xp-start-button:hover  { filter: brightness(1.1); }
+#xp-start-button:active {
+  background: linear-gradient(180deg, #187818, #0e5010);
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
+}
+
+.xp-start-logo {
+  width: 18px; height: 18px;
+  display: inline-flex; align-items: center;
+  flex-shrink: 0;
+}
+.xp-start-logo img { width: 100%; height: 100%; object-fit: contain; }
+.xp-start-text { line-height: 1; }
+
+/* ── Taskbar app buttons ──────────────────────────────────────────── */
+#xp-taskbar-area {
+  flex: 1;
+  display: flex;
+  gap: 2px;
+  padding: 3px 4px;
+  overflow: hidden;
+  align-items: center;
+  z-index: 1;
+}
+.taskbar-app {
+  height: 22px;
+  max-width: 154px;
+  min-width: 60px;
+  /* Sunken inactive state */
+  background: linear-gradient(180deg, #1a5fbc, #1245a0);
+  color: #fff;
+  font-family: var(--xp-font);
+  font-size: 11px;
+  border: 1px solid #0a2e78;
+  border-top-color: #0e3c98;
+  border-radius: 3px;
+  padding: 0 6px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.15);
+  transition: filter 0.08s;
+}
+.taskbar-app.active {
+  /* Pressed / active: darker + inset */
+  background: linear-gradient(180deg, #0e3a90, #0a2870);
+  border-top-color: #061e58;
+  box-shadow: inset 1px 1px 2px rgba(0,0,0,0.45);
+}
+.taskbar-app:hover { filter: brightness(1.2); }
+.taskbar-app img { width: 14px; height: 14px; object-fit: contain; flex-shrink: 0; }
+.taskbar-app span { overflow: hidden; text-overflow: ellipsis; }
+
+/* ── System tray + clock ──────────────────────────────────────────── */
+#xp-tray {
+  display: flex;
+  align-items: stretch;
+  height: 100%;
+  z-index: 2;
+}
+#xp-clock {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0 10px;
+  /* Tray: sunken inset, same background as taskbar but slightly lighter */
+  background: linear-gradient(180deg, #1658b8, #1040a8);
+  border-left: 1px solid #2c6cd8;
+  color: #fff;
+  font-family: var(--xp-font);
+  font-size: 11px;
+  line-height: 1.3;
+  text-align: center;
+  cursor: default;
+  box-shadow: inset 1px 0 0 rgba(255,255,255,0.1);
+}
+#xp-clock .clock-time { font-size: 11px; }
+#xp-clock .clock-date { font-size: 9px; opacity: 0.85; }
+
+/* ═══════════════════════════════════════════════════════════════════
+   START MENU  — exact Luna layout
+═══════════════════════════════════════════════════════════════════ */
+#xp-start-menu {
+  position: absolute;
+  left: 0;
+  bottom: 30px;          /* sits right on top of taskbar */
+  width: 250px;
+  background: #fff;
+  /* Outer border: medium blue */
+  border: 2px solid #0a246a;
+  border-radius: 8px 8px 0 0;
+  overflow: hidden;
+  display: none;
+  flex-direction: column;
+  z-index: 40;
+  box-shadow: 4px 0 12px rgba(0,0,0,0.5), -2px 0 8px rgba(0,0,0,0.3);
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 180ms cubic-bezier(.2,.8,.4,1), transform 180ms cubic-bezier(.2,.8,.4,1);
+}
+#xp-start-menu.open {
+  display: flex;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* User header band */
+.xp-start-header {
+  height: 54px;
+  /* Luna header: cobalt gradient */
+  background: linear-gradient(180deg, #1a52c0 0%, #0f3898 100%);
+  display: flex;
+  align-items: center;
+  padding: 6px 10px;
+  gap: 8px;
+  color: #fff;
+  border-bottom: 2px solid #061e58;
+  flex-shrink: 0;
+}
+.xp-start-header img {
+  width: 34px; height: 34px;
+  border-radius: 4px;
+  border: 2px solid rgba(255,255,255,0.65);
+  object-fit: cover;
+  flex-shrink: 0;
+}
+.xp-start-header-text { display: flex; flex-direction: column; }
+.xp-start-header-name { font-size: 13px; font-weight: bold; line-height: 1.2; }
+.xp-start-header-sub  { font-size: 10px; opacity: 0.8; }
+
+/* Two-column body */
+.xp-start-body {
+  flex: 1;
+  display: flex;
+  min-height: 0;
+}
+.xp-start-left {
+  width: 62%;
+  background: #fff;
+  padding: 4px 0;
+  border-right: 1px solid #b4cde8;
+  display: flex;
+  flex-direction: column;
+}
+.xp-start-right {
+  width: 38%;
+  background: #d3e5fa;   /* XP Luna right panel: light periwinkle */
+  padding: 4px 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* Divider line between "recent" and "all programs" sections */
+.xp-start-sep {
+  height: 1px;
+  background: #b4cde8;
+  margin: 4px 8px;
+}
+
+/* App row */
+.xp-start-app {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 3px 8px 3px 8px;
+  cursor: pointer;
+  color: #000;
+  font-family: var(--xp-font);
+  font-size: 11px;
+  outline: none;
+  transition: background 0.08s;
+}
+.xp-start-app img { width: 24px; height: 24px; object-fit: contain; flex-shrink: 0; }
+.xp-start-app-texts { display: flex; flex-direction: column; }
+.xp-start-app .app-name { font-weight: bold; font-size: 11px; }
+.xp-start-app .app-sub  { font-size: 10px; color: #555; }
+.xp-start-app:hover, .xp-start-app:focus {
+  background: var(--xp-select);
+  color: #fff;
+}
+.xp-start-app:hover .app-sub,
+.xp-start-app:focus .app-sub { color: rgba(255,255,255,0.8); }
+
+/* Right panel links */
+.xp-start-right-section { padding: 4px 6px; }
+.xp-section-title {
+  font-family: var(--xp-font);
+  font-size: 10px;
+  font-weight: bold;
+  color: var(--xp-border-outer);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  padding: 2px 4px;
+  margin-bottom: 2px;
+}
+.xp-section-link {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 6px;
+  font-size: 11px;
+  color: #000;
+  cursor: pointer;
+  border-radius: 2px;
+  transition: background 0.08s;
+}
+.xp-section-link:hover { background: var(--xp-select); color: #fff; }
+
+/* Footer bar */
+.xp-start-bottom {
+  height: 34px;
+  background: linear-gradient(180deg, #1344b4, #0a2870);
+  border-top: 1px solid #061e58;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 0 8px;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.xp-logoff, .xp-shutdown {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  border: 1px solid rgba(255,255,255,0.28);
+  background: rgba(255,255,255,0.08);
+  cursor: pointer;
+  color: #fff;
+  font-family: var(--xp-font);
+  font-size: 11px;
+  transition: background 0.1s;
+}
+.xp-logoff:hover, .xp-shutdown:hover { background: rgba(255,255,255,0.2); }
+.xp-logoff img, .xp-shutdown img { width: 16px; height: 16px; object-fit: contain; }
+
+/* ═══════════════════════════════════════════════════════════════════
+   APP WINDOWS  — pixel-accurate XP Luna chrome
+═══════════════════════════════════════════════════════════════════ */
+.app-window {
+  position: absolute;
+  min-width: 200px;
+  min-height: 130px;
+  background: var(--xp-window-bg);
+  color: #000;
+  font-family: var(--xp-font);
+  font-size: 11px;
+  display: none;
+  overflow: hidden;
+
+  /*
+   * XP window border stack (outer → inner):
+   *  1. 1px dark blue outer frame
+   *  2. 1px white inner highlight
+   *  3. 1px light-blue inner bevel
+   * Achieved with outline + border + box-shadow
+   */
+  border: 3px solid transparent;
+  border-image: none;
+  outline: 1px solid #0a246a;          /* outermost dark frame */
+  box-shadow:
+    0   0 0 1px #fff,                  /* white inner highlight */
+    0   0 0 2px #a0b8d8,               /* blue inner bevel      */
+    4px 4px 12px rgba(0,0,0,0.5);      /* drop shadow           */
+  border-radius: 6px 6px 4px 4px;
+
+  opacity: 0;
+  transform: scale(0.96) translateY(6px);
+  transition: opacity 180ms cubic-bezier(.2,.8,.4,1),
+              transform 180ms cubic-bezier(.2,.8,.4,1);
+  z-index: 5;
+}
+.app-window.visible {
+  display: flex !important;
+  opacity: 1;
+  transform: scale(1) translateY(0);
+}
+/* Must be flex for the column layout to work */
+.app-window { display: none; flex-direction: column; }
+.app-window.visible, .app-window.minimizing { display: flex; }
+.app-window.minimizing {
+  opacity: 0;
+  transform: scale(0.88) translateY(16px);
+}
+.app-window.focused {
+  z-index: 10;
+  box-shadow:
+    0   0 0 1px #fff,
+    0   0 0 2px #a0b8d8,
+    5px 5px 16px rgba(0,0,0,0.6);
+}
+
+/* ── Titlebar ────────────────────────────────────────────────────── */
+/*
+ * XP Luna titlebar (active):
+ *  - Very narrow top highlight (1px near-white)
+ *  - Bright cornflower → deep royal blue gradient
+ *  - Rounded top corners matching window
+ */
+.win-titlebar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 3px 0 6px;
+  height: 25px;
+  flex-shrink: 0;
+
+  /* Exact XP Luna gradient — sampled from screenshot */
+  background: linear-gradient(180deg,
+    #5ba8f5  0%,     /* bright highlight top */
+    #4898f0  4%,
+    #2878d8  30%,
+    #1860c8  70%,
+    #1555be  90%,
+    #1050b8  100%);
+
+  /* Top shine stripe */
+  border-top: 1px solid #a8d0fc;
+
+  color: #fff;
+  font-size: 12px;
+  font-weight: bold;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.7);
+  cursor: grab;
+  border-radius: 5px 5px 0 0;
+}
+.win-titlebar:active { cursor: grabbing; }
+
+/* Inactive titlebar */
+.app-window:not(.focused) .win-titlebar {
+  background: linear-gradient(180deg,
+    #b8c8d8 0%,
+    #9ab0c8 40%,
+    #8898b0 100%);
+  border-top-color: #d0dce8;
+}
+
+.win-titlebar-left {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  overflow: hidden;
+  flex: 1;
+}
+.win-titlebar-icon { width: 16px; height: 16px; object-fit: contain; flex-shrink: 0; }
+.win-titlebar-title {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 12px;
+}
+
+/* ── Caption buttons (exact XP Luna) ─────────────────────────────── */
+/*
+ * XP caption buttons:
+ *  - Each is a small rounded square (~21×21px)
+ *  - Min/Max: same blue gradient as titlebar but brighter
+ *  - Close:   red gradient
+ *  - All have a top-left shine, bottom-right shadow, outer dark border
+ *  - Glyphs: _ ▭ ✕ (or classic XP variants)
+ */
+.win-titlebar-buttons {
+  display: inline-flex;
+  gap: 2px;
+  flex-shrink: 0;
+  align-items: center;
+  margin-left: 4px;
+}
+
+.win-btn {
+  width: 21px;
+  height: 21px;
+  border-radius: 3px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  font-family: 'Marlett', 'Wingdings', var(--xp-font);  /* Marlett has XP glyphs */
+  font-size: 12px;
+  font-weight: normal;
+  color: #fff;
+  text-shadow: 0 1px 1px rgba(0,0,0,0.6);
+
+  /* Blue gradient for min/max */
+  background: linear-gradient(180deg,
+    #78b8f8  0%,
+    #5898e8  10%,
+    #2868d0  50%,
+    #2060c8  51%,
+    #1858c0  100%);
+  border: 1px solid rgba(0,0,100,0.5);
+  box-shadow:
+    inset 0  1px 0 rgba(255,255,255,0.55),
+    inset -1px 0 0 rgba(255,255,255,0.2),
+    inset 0 -1px 0 rgba(0,0,0,0.3),
+    0 1px 2px rgba(0,0,0,0.4);
+  transition: filter 0.08s;
+}
+.win-btn:hover  { filter: brightness(1.18); }
+.win-btn:active {
+  filter: brightness(0.85);
+  box-shadow: inset 0 2px 3px rgba(0,0,0,0.5);
+}
+.win-btn span { pointer-events: none; line-height: 1; display: block; }
+
+/* Close button — red */
+.win-btn-close {
+  background: linear-gradient(180deg,
+    #f89888  0%,
+    #e87060  10%,
+    #c83028  50%,
+    #c02820  51%,
+    #a81e16  100%);
+  border-color: rgba(80,0,0,0.5);
+}
+.win-btn-close:hover {
+  filter: none;
+  background: linear-gradient(180deg,
+    #faa898 0%,
+    #f08070 10%,
+    #d84038 50%,
+    #cc3028 51%,
+    #b82820 100%);
+}
+
+/* ── Menu bar ─────────────────────────────────────────────────────── */
+.win-menubar {
+  background: var(--xp-window-bg);
+  border-bottom: 1px solid #aca899;
+  padding: 1px 2px;
+  display: flex;
+  gap: 0;
+  flex-shrink: 0;
+  height: 19px;
+  align-items: center;
+}
+.win-menu-item {
+  padding: 2px 6px;
+  font-size: 11px;
+  font-family: var(--xp-font);
+  cursor: default;
+  border-radius: 2px;
+  height: 17px;
+  display: flex;
+  align-items: center;
+}
+.win-menu-item:hover {
+  background: var(--xp-select);
+  color: #fff;
+}
+/* Underline shortcut keys */
+.win-menu-item u { text-decoration: underline; }
+
+/* ── Toolbar (address/tool bar below menu bar) ────────────────────── */
+.win-toolbar {
+  background: var(--xp-window-bg);
+  border-bottom: 1px solid #aca899;
+  padding: 2px 4px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+  height: 22px;
+}
+.win-toolbar-input {
+  flex: 1;
+  height: 16px;
+  padding: 0 4px;
+  font-family: var(--xp-font);
+  font-size: 11px;
+  border: 1px solid #7a7a7a;
+  border-top-color: #5a5a5a;
+  border-left-color: #5a5a5a;
+  background: #fff;
+  outline: none;
+}
+
+/* ── Status bar ───────────────────────────────────────────────────── */
+.win-statusbar {
+  height: 19px;
+  background: var(--xp-window-bg);
+  border-top: 1px solid #aca899;
+  display: flex;
+  align-items: center;
+  padding: 0 4px;
+  font-size: 11px;
+  color: #000;
+  flex-shrink: 0;
+  gap: 0;
+}
+/* Sunken panels inside statusbar — classic XP inset bevel */
+.win-statusbar-panel {
+  border: 1px solid #aca899;
+  border-top-color: #777;
+  border-left-color: #777;
+  border-bottom-color: #fff;
+  border-right-color: #fff;
+  padding: 0 6px;
+  height: 15px;
+  display: flex;
+  align-items: center;
+  margin-right: 2px;
+  min-width: 60px;
+}
+
+/* ── Scroll content area ──────────────────────────────────────────── */
+.win-content {
+  padding: 8px 10px;
+  overflow: auto;
+  background: #fff;
+  flex: 1;
+  font-size: 11px;
+}
+.win-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+  min-height: 0;
+}
+
+/* XP-style scrollbars */
+.win-content::-webkit-scrollbar { width: 17px; }
+.win-content::-webkit-scrollbar-track {
+  background: #f0ede0;
+  border-left: 1px solid #aca899;
+}
+.win-content::-webkit-scrollbar-thumb {
+  background: linear-gradient(90deg, #d8d4c8, #f0ece0);
+  border: 1px solid #aca899;
+  border-radius: 1px;
+  min-height: 20px;
+}
+.win-content::-webkit-scrollbar-button {
+  background: var(--xp-window-bg);
+  border: 1px solid #aca899;
+  height: 17px;
+}
+
+/* ── Resize grip ──────────────────────────────────────────────────── */
+.win-resize {
+  position: absolute;
+  bottom: 0; right: 0;
+  width: 16px; height: 16px;
+  cursor: nwse-resize;
+  z-index: 99;
+  /* XP resize dots */
+  background-image:
+    radial-gradient(circle, #aaa 1px, transparent 1px),
+    radial-gradient(circle, #aaa 1px, transparent 1px),
+    radial-gradient(circle, #aaa 1px, transparent 1px),
+    radial-gradient(circle, #fff 1px, transparent 1px),
+    radial-gradient(circle, #fff 1px, transparent 1px),
+    radial-gradient(circle, #fff 1px, transparent 1px);
+  background-size: 4px 4px;
+  background-position:
+    10px 10px, 6px 10px, 10px 6px,
+    9px  9px,  5px 9px,  9px 5px;
+  background-repeat: no-repeat;
+}
+
+/* ── Drag overlay ─────────────────────────────────────────────────── */
+#drag-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 999;
+  display: none;
+  cursor: grabbing;
+}
+#drag-overlay.active { display: block; }
+
+/* ── Context menu ─────────────────────────────────────────────────── */
+#xp-context-menu {
+  position: absolute;
+  background: var(--xp-window-bg);
+  border: 1px solid #7a7a7a;
+  box-shadow: 3px 3px 5px rgba(0,0,0,0.4);
+  padding: 2px 0;
+  font-family: var(--xp-font);
+  font-size: 11px;
+  z-index: 50;
+  display: none;
+  min-width: 150px;
+  border-radius: 1px;
+}
+#xp-context-menu.open { display: block; }
+.ctx-item {
+  padding: 4px 22px 4px 26px;
+  cursor: default;
+  white-space: nowrap;
+  color: #000;
+}
+.ctx-item:hover { background: var(--xp-select); color: #fff; }
+.ctx-sep { height: 1px; background: #aca899; margin: 2px 4px; }
+
+/* ═══════════════════════════════════════════════════════════════════
+   APP-SPECIFIC CONTENT STYLES
+═══════════════════════════════════════════════════════════════════ */
+
+/* — About / CV ─────────────────────────────────────────────────── */
+.cv-header {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 10px;
+  background: linear-gradient(135deg, #e6eefc, #ccddf4);
+  border-bottom: 1px solid #b0c8e4;
+}
+.cv-avatar {
+  width: 44px; height: 44px; border-radius: 50%;
+  background: linear-gradient(135deg, #2060a8, #0a3878);
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; font-size: 18px; font-weight: bold;
+  border: 2px solid rgba(255,255,255,0.7);
+  box-shadow: 0 2px 6px rgba(0,50,150,0.4);
+  flex-shrink: 0;
+}
+.cv-header-info h2 { margin: 0 0 2px; font-size: 13px; color: #0a246a; }
+.cv-header-info p  { margin: 0; font-size: 10px; color: #444; }
+.cv-badges { display: flex; gap: 3px; margin-top: 3px; flex-wrap: wrap; }
+.cv-badge {
+  background: #2060a8; color: #fff;
+  font-size: 9px; padding: 1px 5px;
+  border-radius: 8px; font-weight: bold;
+}
+.cv-section { padding: 6px 10px 3px; }
+.cv-section h3 {
+  font-size: 10px; font-weight: bold;
+  text-transform: uppercase; letter-spacing: 0.4px;
+  color: #0a246a; margin: 0 0 5px;
+  padding-bottom: 2px;
+  border-bottom: 1px solid #b0c8e4;
+}
+.cv-row {
+  display: flex; align-items: flex-start;
+  gap: 6px; padding: 3px 0;
+  border-bottom: 1px solid #ece9d8;
+  font-size: 11px;
+}
+.cv-row:last-child { border-bottom: none; }
+.cv-row-icon { font-size: 12px; flex-shrink: 0; margin-top: 1px; }
+.cv-row-title { font-weight: bold; color: #111; font-size: 11px; }
+.cv-row-sub   { color: #555; font-size: 10px; }
+.cv-btn {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 4px 12px;
+  background: linear-gradient(180deg, #4888d0, #2060a8);
+  color: #fff; border: 1px solid #0a3878;
+  border-radius: 3px; font-family: var(--xp-font); font-size: 11px;
+  cursor: pointer; text-decoration: none;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.35), 0 1px 2px rgba(0,0,0,0.3);
+  transition: filter 0.08s;
+}
+.cv-btn:hover { filter: brightness(1.1); }
+
+/* — Certs ──────────────────────────────────────────────────────── */
+.cert-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 5px 7px; margin-bottom: 5px;
+  border: 1px solid #ccc8bc; border-radius: 3px;
+  background: linear-gradient(135deg, #fff, #f8f4ea);
+}
+.cert-icon {
+  width: 28px; height: 28px; flex-shrink: 0;
+  background: linear-gradient(135deg, #2060a8, #0a3878);
+  border-radius: 4px;
+  display: flex; align-items: center; justify-content: center; font-size: 14px;
+}
+.cert-info .cert-name { font-weight: bold; font-size: 11px; color: #0a246a; }
+.cert-info .cert-org  { font-size: 10px; color: #555; }
+.cert-info .cert-year { font-size: 10px; color: #888; }
+
+/* — Projects ───────────────────────────────────────────────────── */
+.proj-item {
+  padding: 6px 8px; margin-bottom: 5px;
+  border: 1px solid #ccc8bc; border-radius: 3px;
+  background: linear-gradient(135deg, #fff, #f8f4ea);
+  cursor: pointer; transition: box-shadow 0.12s;
+}
+.proj-item:hover { box-shadow: 0 2px 8px rgba(0,50,150,0.2); }
+.proj-name { font-weight: bold; font-size: 11px; color: #0a246a; margin-bottom: 2px; }
+.proj-tags { display: flex; gap: 3px; flex-wrap: wrap; margin-bottom: 3px; }
+.proj-tag {
+  background: #dde8f8; color: #1a4888; border: 1px solid #b0c8e8;
+  font-size: 9px; padding: 0 4px; border-radius: 2px;
+}
+.proj-desc { font-size: 10px; color: #444; line-height: 1.4; }
+
+/* — Contact form ───────────────────────────────────────────────── */
+.contact-field { margin-bottom: 6px; }
+.contact-field label {
+  display: block; font-size: 11px; font-weight: bold;
+  color: #000; margin-bottom: 2px;
+}
+.contact-field input,
+.contact-field textarea {
+  width: 100%; padding: 3px 5px;
+  font-family: var(--xp-font); font-size: 11px;
+  /* Classic XP inset field border */
+  border: 1px solid #7a7a7a;
+  border-top-color: #4a4a4a;
+  border-left-color: #4a4a4a;
+  border-radius: 0;
+  box-sizing: border-box;
+  background: #fff; outline: none;
+}
+.contact-field input:focus,
+.contact-field textarea:focus {
+  box-shadow: 0 0 0 2px rgba(30,80,200,0.35);
+}
+.contact-field textarea { resize: vertical; min-height: 45px; }
+
+/* — GitHub ─────────────────────────────────────────────────────── */
+.gh-repo {
+  display: flex; align-items: center; gap: 6px;
+  padding: 4px 6px; border-bottom: 1px solid #ece9d8;
+  font-size: 11px; cursor: default; transition: background 0.08s;
+}
+.gh-repo:hover { background: #ddeeff; }
+.gh-repo-icon { font-size: 13px; }
+.gh-repo-name { font-weight: bold; color: #0050c8; flex: 1; }
+.gh-repo-name:hover { text-decoration: underline; }
+.gh-repo-lang {
+  font-size: 10px; color: #555;
+  background: #f0ede0; padding: 0 5px;
+  border-radius: 6px; border: 1px solid #ccc8bc;
+}
+
+/* — LinkedIn ───────────────────────────────────────────────────── */
+.li-card {
+  background: linear-gradient(135deg, #0a66c2, #004182);
+  color: #fff; padding: 10px; border-radius: 4px;
+  margin-bottom: 8px; display: flex; gap: 10px; align-items: flex-start;
+}
+.li-avatar {
+  width: 38px; height: 38px;
+  background: rgba(255,255,255,0.18); border-radius: 4px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; font-weight: bold; flex-shrink: 0;
+  border: 2px solid rgba(255,255,255,0.45);
+}
+.li-name  { font-size: 13px; font-weight: bold; margin-bottom: 2px; }
+.li-title { font-size: 10px; opacity: 0.85; }
+.li-stats { display: flex; gap: 10px; margin-top: 6px; font-size: 10px; opacity: 0.8; }
+.li-stat  { display: flex; flex-direction: column; align-items: center; }
+.li-stat-num { font-size: 13px; font-weight: bold; opacity: 1; }
+
+/* ═══════════════════════════════════════════════════════════════════
+   CRT SCANLINE OVERLAY
+═══════════════════════════════════════════════════════════════════ */
+#crt-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 9000;
+  pointer-events: none;
+  /* Repeating scanline stripes */
+  background: repeating-linear-gradient(
+    180deg,
+    transparent            0px,
+    transparent            2px,
+    rgba(0,0,0,0.07)       2px,
+    rgba(0,0,0,0.07)       3px
+  );
+  /* Vignette corners */
+  box-shadow: inset 0 0 60px rgba(0,0,0,0.35);
+  border-radius: 2px;
+  /* Subtle flicker */
+  animation: crtFlicker 8s infinite;
+}
+@keyframes crtFlicker {
+  0%,100%  { opacity: 1;    }
+  92%      { opacity: 1;    }
+  93%      { opacity: 0.88; }
+  94%      { opacity: 1;    }
+  97%      { opacity: 0.94; }
+  98%      { opacity: 1;    }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   BOOT SCREEN — Exact Windows XP (black bg, flag+text, blue bar)
+═══════════════════════════════════════════════════════════════════ */
+#os-boot-screen {
+  position: absolute;
+  inset: 0;
+  z-index: 8000;
+  background: #000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.boot-center {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 30px;
+}
+.boot-flag-wrap { flex-shrink: 0; }
+.boot-flag { width: 74px; height: 74px; display: block; }
+.boot-text-wrap { display: flex; flex-direction: column; line-height: 1.0; }
+.boot-microsoft {
+  font-family: 'Times New Roman', Times, serif;
+  font-size: 11px; color: rgba(255,255,255,0.8);
+  font-style: italic; display: block; margin-bottom: 2px;
+}
+.boot-windows {
+  font-family: 'Times New Roman', Times, serif;
+  font-size: 40px; color: #fff;
+  font-weight: normal; font-style: italic;
+  display: block; line-height: 1.0;
+}
+.boot-tm { font-size: 16px; vertical-align: super; font-style: normal; }
+.boot-xp-label { display: block; line-height: 1.0; }
+.boot-xp-label em {
+  font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+  font-size: 36px; font-style: italic; font-weight: bold;
+  color: #f90; letter-spacing: -1px;
+}
+.boot-bar-wrap {
+  position: absolute; bottom: 56px;
+  left: 50%; transform: translateX(-50%);
+}
+.boot-bar-track {
+  display: flex; gap: 3px;
+  padding: 2px 3px;
+  border: 1px solid rgba(100,140,200,0.2);
+  border-radius: 3px; background: rgba(0,0,0,0.5);
+}
+.boot-bar-seg {
+  width: 14px; height: 11px;
+  border-radius: 2px; background: #3a6ea5;
+  opacity: 0; animation: bootPulse 1.2s ease-in-out infinite;
+}
+.boot-bar-seg:nth-child(1) { animation-delay: 0.00s; }
+.boot-bar-seg:nth-child(2) { animation-delay: 0.22s; }
+.boot-bar-seg:nth-child(3) { animation-delay: 0.44s; }
+@keyframes bootPulse {
+  0%,100% { opacity: 0.15; }
+  50%     { opacity: 1.00; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   LOGIN SCREEN
+═══════════════════════════════════════════════════════════════════ */
+#xp-login-screen {
+  position: absolute;
+  inset: 0;
+  z-index: 7000;
+  display: none;
+  background: linear-gradient(180deg, #1a3abb 0%, #1530a0 40%, #0e2478 100%);
+  align-items: center;
+  justify-content: center;
+}
+#xp-login-screen[style*="display: block"] {
+  display: flex !important;
+}
+/* login screen initial hide handled by JS */
+
+#xp-login-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+#xp-login-account {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 14px 20px;
+  border-radius: 6px;
+  border: 1px solid rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.08);
+  cursor: pointer;
+  transition: background 0.2s, transform 0.15s;
+  backdrop-filter: blur(4px);
+  color: #fff;
+  font-family: var(--xp-font);
+  min-width: 120px;
+  text-align: center;
+}
+#xp-login-account:hover {
+  background: rgba(255,255,255,0.18);
+  transform: scale(1.04);
+}
+.login-avatar {
+  width: 52px; height: 52px;
+  border-radius: 6px;
+  background: linear-gradient(135deg, #4a8fce, #1a4888);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; font-weight: bold;
+  border: 3px solid rgba(255,255,255,0.6);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+}
+.login-name  { font-size: 13px; font-weight: bold; }
+.login-hint  { font-size: 10px; opacity: 0.7; }
+
+/* ═══════════════════════════════════════════════════════════════════
+   SCREENSAVER
+═══════════════════════════════════════════════════════════════════ */
+#xp-screensaver {
+  position: absolute;
+  inset: 0;
+  z-index: 6000;
+  background: #000;
+  display: none;
+  opacity: 0;
+  transition: opacity 0.4s;
+  cursor: none;
+}
+#ss-canvas {
+  width: 100%; height: 100%;
+  display: block;
+}
+.ss-hint {
+  position: absolute;
+  bottom: 10px; left: 50%;
+  transform: translateX(-50%);
+  color: rgba(0,255,0,0.4);
+  font-family: monospace;
+  font-size: 10px;
+  pointer-events: none;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   NOTEPAD APP
+═══════════════════════════════════════════════════════════════════ */
+.notepad-area {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  padding: 6px 8px;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 12px;
+  line-height: 1.5;
+  border: none;
+  outline: none;
+  resize: none;
+  background: #fff;
+  color: #000;
+  box-sizing: border-box;
+  white-space: pre;
+  overflow: auto;
+}
+.notepad-area::-webkit-scrollbar { width: 17px; }
+.notepad-area::-webkit-scrollbar-track { background: #f0ede0; border-left:1px solid #aca899; }
+.notepad-area::-webkit-scrollbar-thumb { background: linear-gradient(90deg,#d8d4c8,#f0ece0); border:1px solid #aca899; }
+
+/* ═══════════════════════════════════════════════════════════════════
+   CMD / TERMINAL APP
+═══════════════════════════════════════════════════════════════════ */
+.cmd-window {
+  border-color: #000 !important;
+}
+.cmd-titlebar {
+  background: #000 !important;
+  border-top-color: #333 !important;
+}
+.cmd-body {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  background: #000;
+  padding: 0;
+}
+.cmd-output {
+  flex: 1;
+  overflow-y: auto;
+  padding: 6px 8px;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 12px;
+  line-height: 1.6;
+  color: #c0c0c0;
+  background: #000;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+.cmd-output::-webkit-scrollbar { width: 8px; }
+.cmd-output::-webkit-scrollbar-track { background: #111; }
+.cmd-output::-webkit-scrollbar-thumb { background: #444; }
+
+.cmd-line   { color: #c0c0c0; }
+.cmd-prompt { color: #fff; font-weight: bold; }
+.cmd-warn   { color: #ff6060; font-weight: bold; }
+.cmd-cursor::after {
+  content: '█';
+  animation: blink 1s step-end infinite;
+  color: #c0c0c0;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+/* ═══════════════════════════════════════════════════════════════════
+   MINESWEEPER
+═══════════════════════════════════════════════════════════════════ */
+.mines-ui {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 6px;
+  background: var(--xp-window-bg);
+  gap: 6px;
+}
+.mines-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 202px;
+  background: var(--xp-window-bg);
+  border: 2px inset #888;
+  padding: 4px 6px;
+  box-sizing: border-box;
+}
+.mines-lcd {
+  background: #000;
+  color: #f00;
+  font-family: 'Courier New', monospace;
+  font-size: 18px;
+  font-weight: bold;
+  padding: 2px 4px;
+  letter-spacing: 2px;
+  min-width: 38px;
+  text-align: center;
+  border: 1px inset #555;
+}
+.mines-face {
+  font-size: 16px;
+  width: 26px; height: 26px;
+  background: var(--xp-window-bg);
+  border: 2px outset #fff;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  padding: 0;
+}
+.mines-face:active { border-style: inset; }
+
+/* ═══════════════════════════════════════════════════════════════════
+   ERROR DIALOG
+═══════════════════════════════════════════════════════════════════ */
+.error-dialog {
+  width: 360px !important;
+  height: auto !important;
+  min-height: 0 !important;
+}
+.error-titlebar {
+  background: linear-gradient(180deg, #e85040 0%, #c02020 100%) !important;
+  border-top-color: #f08070 !important;
+}
+.error-body {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 14px 8px;
+  background: var(--xp-window-bg);
+}
+.error-icon {
+  font-size: 28px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.error-title {
+  font-weight: bold;
+  font-size: 12px;
+  margin-bottom: 6px;
+  color: #000;
+}
+.error-msg {
+  font-size: 11px;
+  color: #222;
+  line-height: 1.5;
+}
+.error-footer {
+  background: var(--xp-window-bg);
+  border-top: 1px solid #aca899;
+  padding: 8px 12px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════
+   ONBOARDING OVERLAY
+═══════════════════════════════════════════════════════════════════ */
+#onboarding-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  background: rgba(0, 0, 0, 0.72);
+  backdrop-filter: blur(3px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Trebuchet MS', Tahoma, Arial, sans-serif;
+}
+
+/* Each step fills the overlay and centers its card */
+.ob-step {
+  position: absolute;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+
+/* The card itself */
+.ob-card {
+  background: linear-gradient(160deg, #1a1f3a 0%, #12162e 100%);
+  border: 1px solid rgba(80, 140, 255, 0.35);
+  border-radius: 10px;
+  box-shadow:
+    0 0 0 1px rgba(80,140,255,0.12),
+    0 12px 50px rgba(0,0,0,0.7),
+    0 0 40px rgba(40,80,200,0.18);
+  padding: 32px 36px 28px;
+  width: 420px;
+  max-width: 92vw;
+  color: #e8eeff;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Subtle scanline effect inside card */
+.ob-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 3px,
+    rgba(0,0,0,0.06) 3px,
+    rgba(0,0,0,0.06) 4px
+  );
+  pointer-events: none;
+  border-radius: 10px;
+}
+
+/* Fade+slide-up animation */
+@keyframes obFadeUp {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+.ob-card.ob-anim {
+  animation: obFadeUp 0.38s ease forwards;
+}
+
+/* Step number badge */
+.ob-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10px;
+  font-weight: bold;
+  color: #5090ff;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+.ob-badge-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: #5090ff;
+  box-shadow: 0 0 6px #5090ff;
+}
+
+/* Title */
+.ob-title {
+  font-size: 20px;
+  font-weight: bold;
+  color: #fff;
+  margin: 0 0 8px;
+  text-shadow: 0 0 20px rgba(80,140,255,0.4);
+}
+.ob-title span { color: #5cb8ff; }
+
+/* Body text */
+.ob-body {
+  font-size: 12.5px;
+  color: rgba(220,228,255,0.8);
+  line-height: 1.7;
+  margin: 0 0 20px;
+}
+.ob-body b { color: #fff; }
+.ob-body .ob-key {
+  display: inline-block;
+  background: rgba(80,140,255,0.18);
+  border: 1px solid rgba(80,140,255,0.4);
+  border-radius: 3px;
+  padding: 1px 6px;
+  font-size: 11px;
+  font-family: monospace;
+  color: #90c8ff;
+  margin: 0 2px;
+}
+
+/* Icon row */
+.ob-icon-row {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
+.ob-icon-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  color: rgba(200,215,255,0.7);
+  width: 52px;
+  text-align: center;
+}
+.ob-icon-item span:first-child { font-size: 22px; }
+
+/* Matrix mini canvas preview */
+.ob-matrix-wrap {
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid rgba(0,200,80,0.3);
+  margin-bottom: 18px;
+  background: #000;
+  height: 70px;
+}
+#ob-matrix-canvas { display: block; width: 100%; height: 100%; }
+
+/* Progress dots */
+.ob-dots {
+  display: flex;
+  gap: 5px;
+  justify-content: center;
+  margin-bottom: 18px;
+}
+.ob-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: rgba(80,140,255,0.25);
+  border: 1px solid rgba(80,140,255,0.4);
+  transition: background 0.2s;
+}
+.ob-dot.active {
+  background: #5090ff;
+  box-shadow: 0 0 6px #5090ff;
+}
+
+/* Button row */
+.ob-btns {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  align-items: center;
+}
+.ob-btn {
+  padding: 7px 18px;
+  border-radius: 5px;
+  font-size: 12px;
+  font-family: 'Trebuchet MS', Tahoma, sans-serif;
+  cursor: pointer;
+  transition: all 0.15s;
+  border: none;
+  font-weight: bold;
+}
+.ob-btn-primary {
+  background: linear-gradient(180deg, #3a78f0 0%, #1a4ed0 100%);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(30,70,200,0.5);
+}
+.ob-btn-primary:hover {
+  background: linear-gradient(180deg, #5090ff 0%, #2a5ef0 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(30,70,200,0.6);
+}
+.ob-btn-secondary {
+  background: rgba(255,255,255,0.07);
+  color: rgba(200,215,255,0.8);
+  border: 1px solid rgba(255,255,255,0.12);
+}
+.ob-btn-secondary:hover {
+  background: rgba(255,255,255,0.12);
+  color: #fff;
+}
+
+/* Welcome card — step 1 special styling */
+#ob-step-1 .ob-card {
+  text-align: center;
+  padding: 40px 36px 32px;
+}
+#ob-step-1 .ob-title { font-size: 24px; margin-bottom: 12px; }
+#ob-step-1 .ob-body  { font-size: 13px; }
+#ob-step-1 .ob-btns  { justify-content: center; flex-direction: column; align-items: center; gap: 8px; }
+#ob-step-1 .ob-btn   { min-width: 160px; padding: 9px 20px; font-size: 13px; }
+
+
+/* ═══════════════════════════════════════════════════════════════════
+   INTRO OVERLAY — terminal boot + ACCESS GRANTED + glitch
+═══════════════════════════════════════════════════════════════════ */
+#intro-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 999999;
+  background: #000;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: stretch;
+  overflow: hidden;
+  /* prevent any flash of content underneath */
+  pointer-events: all;
+}
+
+/* ── Terminal output area ── */
+#intro-term-output {
+  flex: 1;
+  padding: 32px 40px 16px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 0;
+  transition: opacity 0.25s;
+}
+
+.iterm-row {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: clamp(11px, 1.4vw, 15px);
+  color: #00dd55;
+  line-height: 1.75;
+  white-space: pre;
+  text-shadow: 0 0 8px rgba(0,220,80,0.7);
+}
+
+/* Blinking block cursor */
+.iterm-cursor {
+  display: inline-block;
+  color: #00ff66;
+  animation: termBlink 0.7s step-end infinite;
+}
+@keyframes termBlink {
+  0%,100% { opacity: 1; }
+  50%      { opacity: 0; }
+}
+
+/* ── ACCESS GRANTED full-screen flash ── */
+#intro-granted {
+  position: absolute;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 16px;
+  background: #000;
+  z-index: 2;
+}
+
+.intro-granted-text {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: clamp(28px, 5vw, 58px);
+  font-weight: bold;
+  color: #00ff66;
+  letter-spacing: 6px;
+  text-shadow:
+    0 0 20px rgba(0,255,100,0.9),
+    0 0 50px rgba(0,255,100,0.5),
+    0 0 100px rgba(0,255,100,0.25);
+  text-align: center;
+}
+.intro-granted-sub {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: clamp(11px, 1.3vw, 14px);
+  color: rgba(0,255,100,0.55);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+}
+
+/* Green scanlines overlay on the whole intro */
+#intro-overlay::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 3px,
+    rgba(0, 0, 0, 0.18) 3px,
+    rgba(0, 0, 0, 0.18) 4px
+  );
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* ── Glitch canvas (drawn by JS) ── */
+#intro-glitch-canvas {
+  position: absolute;
+  inset: 0;
+  display: none;
+  z-index: 5;
+}
+
+/* ── Shatter animation — overlay breaks apart and vanishes ── */
+@keyframes introShatter {
+  0%   {
+    opacity: 1;
+    transform: scale(1) skewX(0deg);
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+  }
+  15%  {
+    opacity: 1;
+    transform: scale(1.015) skewX(-2deg);
+    clip-path: polygon(2% 0, 100% 0, 98% 100%, 0 100%);
+  }
+  30%  {
+    opacity: 0.9;
+    transform: scale(0.995) skewX(3deg) translateX(-4px);
+    clip-path: polygon(0 0, 98% 1%, 100% 99%, 1% 100%);
+    filter: hue-rotate(90deg) brightness(1.5);
+  }
+  50%  {
+    opacity: 0.6;
+    transform: scale(1.02) skewX(-4deg) translateY(3px);
+    clip-path: polygon(5% 0, 100% 2%, 95% 98%, 0 100%);
+    filter: hue-rotate(180deg) brightness(2);
+  }
+  70%  {
+    opacity: 0.25;
+    transform: scale(1.06) skewX(6deg) translateX(8px);
+    clip-path: polygon(10% 5%, 100% 0, 90% 95%, 0 100%);
+    filter: hue-rotate(270deg) brightness(3);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.15) skewX(-8deg) translateY(-6px);
+    clip-path: polygon(50% 50%, 50% 50%, 50% 50%, 50% 50%);
+    filter: brightness(5);
+  }
+}
+
+.intro-shatter {
+  animation: introShatter 0.55s cubic-bezier(0.55, 0, 1, 0.45) forwards;
+}
