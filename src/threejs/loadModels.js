@@ -23,7 +23,6 @@ const MODELS = {
   plant:        gdrive('1Xr5rh3ib8LWswMu8WwJDxkVocriqwlrH'),
   vending:      gdrive('1PrSTIYp8NvqwXgfQi2u9kkGFMfKzJwuu'),
   floor_lamp:   gdrive('1GisE9-xnt3_lIrQH-kq4RkCqziipgc47'),
-  retro_tv:     gdrive('19vmmQD9z06k9jXXlawvL_3Vz23u23lmk'),
 };
 
 // ── Loading progress tracker ──────────────────────────────────────
@@ -171,13 +170,7 @@ export function loadFloorLamp(scene) {
   });
 }
 
-export function loadRetroTV(scene) {
-  loadModel(scene, MODELS.retro_tv, {
-    x: 3400, y: -300, z: -1800,
-    sx: 1260, sy: 1260, sz: 1260,
-    ry: Math.PI * -0.3,
-  });
-}
+
 
 export function loadPlant(scene) {
   loadModel(scene, MODELS.plant, {
