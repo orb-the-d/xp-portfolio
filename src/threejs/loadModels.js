@@ -9,20 +9,18 @@ dracoLoader.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5
 const loader = new GLTFLoader();
 loader.setDRACOLoader(dracoLoader);
 
-// ── Google Drive CDN URLs ─────────────────────────────────────────
-// confirm=t bypasses the virus-scan redirect for large files
-function gdrive(id) {
-  return `https://drive.google.com/uc?export=download&confirm=t&id=${id}`;
-}
+// ── Supabase CDN URLs ─────────────────────────────────────────────
+const BASE = 'https://cviwlvkvomxsgwspdouw.supabase.co/storage/v1/object/public/models/';
 
 const MODELS = {
-  cyberroom:    gdrive('1yY7okBhoqDOWqH8VFJxS1pBuW5W-uN1W'),
-  cycle_knight: gdrive('1g2u6EBiPrQPZay_JAJ6uPkaSm5M3X6P9'),
-  sofa:         gdrive('1rsMyM2pphUMKUkiQlnKeefbdmi0RAkPX'),
-  island:       gdrive('1qjROxoX1bruKLVwEC2rzATEPFp5PHlY0'),
-  plant:        gdrive('1Xr5rh3ib8LWswMu8WwJDxkVocriqwlrH'),
-  vending:      gdrive('1PrSTIYp8NvqwXgfQi2u9kkGFMfKzJwuu'),
-  floor_lamp:   gdrive('1GisE9-xnt3_lIrQH-kq4RkCqziipgc47'),
+  cyberroom:    BASE + 'cyberroom_2.glb',
+  cycle_knight: BASE + 'cyber_knight_super_cycle.glb',
+  sofa:         BASE + 'sofa.glb',
+  island:       BASE + 'basic_floating_island.glb',
+  plant:        BASE + 'rhyzome_plant.glb',
+  vending:      BASE + 'vending_machine.glb',
+  floor_lamp:   BASE + 'floor_lamp.glb',
+  // retro_tv removed — 61MB, too large
 };
 
 // ── Loading progress tracker ──────────────────────────────────────
@@ -89,7 +87,6 @@ function fixMaterials(model) {
     const mats = Array.isArray(child.material) ? child.material : [child.material];
     mats.forEach(m => {
       if (!m) return;
-      // Convert MeshBasicMaterial → MeshStandardMaterial so it reacts to lights
       if (m.isMeshBasicMaterial) {
         child.material = new THREE.MeshStandardMaterial({
           color:     m.color,
@@ -101,7 +98,6 @@ function fixMaterials(model) {
       }
       if (m.isMeshStandardMaterial || m.isMeshPhysicalMaterial) {
         m.envMapIntensity = 0.6;
-        // Lift near-black colors so they're visible under lighting
         if (m.color && m.color.r < 0.05 && m.color.g < 0.05 && m.color.b < 0.05) {
           m.color.setScalar(0.08);
         }
@@ -124,7 +120,6 @@ function loadModel(scene, url, { x=0, y=0, z=0, sx=1, sy=1, sz=1, ry=0 } = {}) {
       model.rotation.y = ry;
       fixMaterials(model);
 
-      // Start invisible — fade in with all others once everything is loaded
       model.traverse(child => {
         if (child.isMesh) {
           const mats = Array.isArray(child.material) ? child.material : [child.material];
@@ -140,7 +135,7 @@ function loadModel(scene, url, { x=0, y=0, z=0, sx=1, sy=1, sz=1, ry=0 } = {}) {
     undefined,
     (err) => {
       console.error(`Failed to load: ${url}`, err);
-      loadedModels++;   // still count it so progress bar completes
+      loadedModels++;
       updateLoadingBar();
     }
   );
@@ -170,8 +165,6 @@ export function loadFloorLamp(scene) {
   });
 }
 
-
-
 export function loadPlant(scene) {
   loadModel(scene, MODELS.plant, {
     x: -560, y: -680, z: -200,
@@ -187,19 +180,18 @@ export function loadVendingMachine(scene) {
   });
 }
 
-export function loadFloatingIsland(scene) {
-  loadModel(scene, MODELS.island, {
-    x: 3000, y: -1500, z: -2200,
-    sx: 170, sy: 170, sz: 170,
-    ry: Math.PI * 0.7,
-  });
-}
-
-
 export function loadCycleKnight(scene) {
   loadModel(scene, MODELS.cycle_knight, {
     x: -1680, y: -510, z: -2000,
     sx: 290, sy: 290, sz: 290,
     ry: -Math.PI * 0.1,
+  });
+}
+
+export function loadFloatingIsland(scene) {
+  loadModel(scene, MODELS.island, {
+    x: 3000, y: -1500, z: -2200,
+    sx: 170, sy: 170, sz: 170,
+    ry: Math.PI * 0.7,
   });
 }
