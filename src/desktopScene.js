@@ -7,7 +7,7 @@ import {
   loadRoom,
   loadSofa,
   loadFloorLamp,
-  //loadRetroTV,
+  loadRetroTV,
   loadPlant,
   loadVendingMachine,
   loadCycleKnight,
@@ -41,7 +41,7 @@ loadDesk(scene);           // main desk + PC setup (original)
 //loadRoom(scene);           // room walls / interior backdrop
 loadSofa(scene);           // sofa, left of desk
 loadFloorLamp(scene);      // floor lamp, behind sofa
-//loadRetroTV(scene);        // retro TV on left wall
+loadRetroTV(scene);        // retro TV on left wall
 loadPlant(scene);          // rhyzome plant, right corner
 loadVendingMachine(scene); // vending machine, back-right wall
 loadCycleKnight(scene);    // cyber motorcycle, right foreground
