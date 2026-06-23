@@ -1,17 +1,15 @@
 // src/intro.js
-// Terminal boot intro — fixed 5s duration, no dependency on model loading
+// Pure JS timing — no CSS animation dependency, cannot freeze
 
 export function initIntro() {
-  const overlay   = document.getElementById('intro-overlay');
+  const overlay = document.getElementById('intro-overlay');
   if (!overlay) return { onModelsReady: () => {} };
 
   const termOutput = document.getElementById('intro-term-output');
   const grantedEl  = document.getElementById('intro-granted');
   const canvas     = document.getElementById('intro-glitch-canvas');
 
-  let glitchStarted = false;
-
-  // ── Terminal lines with absolute timestamps ───────────────────
+  // ── Terminal lines ────────────────────────────────────────────
   const LINES = [
     { text: 'BIOS v2.04  —  POST OK',               t: 0    },
     { text: 'Initializing secure environment...',    t: 400  },
@@ -24,59 +22,44 @@ export function initIntro() {
     { text: '> Identity confirmed',                  t: 3700 },
   ];
 
-  // ── Type a single line ────────────────────────────────────────
   function typeLine(text) {
     const row = document.createElement('div');
     row.className = 'iterm-row';
     termOutput.appendChild(row);
     termOutput.scrollTop = termOutput.scrollHeight;
-
     let i = 0;
     const cursor = document.createElement('span');
     cursor.className = 'iterm-cursor';
     cursor.textContent = '█';
-
     const iv = setInterval(() => {
       row.textContent = text.slice(0, i);
       row.appendChild(cursor);
       i++;
-      if (i > text.length) {
-        clearInterval(iv);
-        row.textContent = text;
-      }
+      if (i > text.length) { clearInterval(iv); row.textContent = text; }
     }, 20);
   }
 
-  // ── Schedule all lines ────────────────────────────────────────
   LINES.forEach(({ text, t }) => setTimeout(() => typeLine(text), t));
 
-  // ── ACCESS GRANTED at t=4200 ──────────────────────────────────
+  // ── ACCESS GRANTED at 4200ms ──────────────────────────────────
   setTimeout(() => {
     termOutput.style.transition = 'opacity 0.3s';
     termOutput.style.opacity = '0';
-
     setTimeout(() => {
       grantedEl.style.display = 'flex';
-      let flickers = 0;
-      const flicker = setInterval(() => {
-        grantedEl.style.opacity = flickers % 2 === 0 ? '1' : '0';
-        flickers++;
-        if (flickers >= 6) {
-          clearInterval(flicker);
-          grantedEl.style.opacity = '1';
-        }
+      let f = 0;
+      const fl = setInterval(() => {
+        grantedEl.style.opacity = f % 2 === 0 ? '1' : '0';
+        f++;
+        if (f >= 6) { clearInterval(fl); grantedEl.style.opacity = '1'; }
       }, 80);
     }, 300);
   }, 4200);
 
-  // ── Glitch + shatter at t=5200 — NO model dependency ─────────
+  // ── Glitch at 5200ms ─────────────────────────────────────────
   setTimeout(() => startGlitch(), 5200);
 
-  // ── Glitch phase ─────────────────────────────────────────────
   function startGlitch() {
-    if (glitchStarted) return;
-    glitchStarted = true;
-
     const W = window.innerWidth;
     const H = window.innerHeight;
     canvas.width  = W;
@@ -92,26 +75,20 @@ export function initIntro() {
       ctx.fillStyle = '#000';
       ctx.fillRect(0, 0, W, H);
 
-      // Horizontal RGB tear strips
       for (let s = 0; s < 20; s++) {
         const y  = Math.random() * H;
         const h  = 2 + Math.random() * 24;
         const dx = (Math.random() - 0.5) * 70;
-        ctx.fillStyle = 'rgba(255,0,0,0.65)';
-        ctx.fillRect(dx, y, W, h);
-        ctx.fillStyle = 'rgba(0,255,70,0.45)';
-        ctx.fillRect(-dx * 0.5, y + 1, W, h);
+        ctx.fillStyle = 'rgba(255,0,0,0.65)';   ctx.fillRect(dx,        y, W, h);
+        ctx.fillStyle = 'rgba(0,255,70,0.45)';  ctx.fillRect(-dx * 0.5, y + 1, W, h);
         if (Math.random() > 0.65) {
           ctx.fillStyle = 'rgba(255,255,255,0.9)';
           ctx.fillRect(0, y, W, 2);
         }
       }
-
-      // Scanlines
       ctx.fillStyle = 'rgba(0,255,70,0.04)';
       for (let y = 0; y < H; y += 4) ctx.fillRect(0, y, W, 2);
 
-      // Ghost ACCESS GRANTED text
       ctx.font = `bold ${Math.round(W * 0.04)}px monospace`;
       ctx.fillStyle = `rgba(0,255,70,${0.25 + Math.random() * 0.5})`;
       ctx.textAlign = 'center';
@@ -122,23 +99,33 @@ export function initIntro() {
 
       frame++;
       if (frame < 28) requestAnimationFrame(drawGlitch);
-      else            startShatter();
+      else            startFadeOut();
     }
-
     requestAnimationFrame(drawGlitch);
   }
 
-  // ── Shatter ───────────────────────────────────────────────────
-  function startShatter() {
+  // ── Pure JS fade-out — no CSS animation, guaranteed to finish ─
+  function startFadeOut() {
     canvas.style.display = 'none';
-    overlay.classList.add('intro-shatter');
-    overlay.addEventListener('animationend', () => overlay.remove(), { once: true });
+    overlay.style.transition = 'none';
+
+    let opacity = 1;
+    const STEPS    = 20;
+    const INTERVAL = 25; // 20 steps × 25ms = 500ms total
+
+    const iv = setInterval(() => {
+      opacity -= 1 / STEPS;
+      overlay.style.opacity = Math.max(0, opacity).toString();
+
+      if (opacity <= 0) {
+        clearInterval(iv);
+        // Hard remove — no waiting for any event
+        overlay.style.display = 'none';
+        overlay.style.pointerEvents = 'none';
+        try { overlay.remove(); } catch(e) { /* already gone */ }
+      }
+    }, INTERVAL);
   }
 
-  // ── onModelsReady: kept for API compatibility but not required ─
-  function onModelsReady() {
-    // models ready early? do nothing — timing is fixed
-  }
-
-  return { onModelsReady };
+  return { onModelsReady: () => {} };
 }
