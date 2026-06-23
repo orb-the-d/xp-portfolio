@@ -1908,9 +1908,12 @@ canvas { display: block; }
   align-items: stretch;
   justify-content: stretch;
   overflow: hidden;
-  /* prevent any flash of content underneath */
   pointer-events: all;
 }
+/* JS removes the element entirely — but if CSS fights back, this wins */
+#intro-overlay[style*="display: none"] { display: none !important; }
+#intro-overlay[style*="display:none"]  { display: none !important; }
+#intro-overlay[style*="opacity: 0"]    { pointer-events: none !important; }
 
 /* ── Terminal output area ── */
 #intro-term-output {
@@ -2041,4 +2044,14 @@ canvas { display: block; }
 
 .intro-shatter {
   animation: introShatter 0.55s cubic-bezier(0.55, 0, 1, 0.45) forwards;
+}
+
+/* Force-hide intro when JS marks it done */
+#intro-overlay.intro-done,
+#intro-overlay[style*="display:none"],
+#intro-overlay[style*="display: none"] {
+  display: none !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
 }

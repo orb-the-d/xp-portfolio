@@ -1,3 +1,4 @@
+// intro.js — build v5 — 2026-06-23T12:00:09.003615
 // src/intro.js
 // Pure JS timing — no CSS animation dependency, cannot freeze
 
@@ -8,12 +9,14 @@ export function initIntro() {
   console.log('[INTRO] overlay found, starting sequence');
 
   // ── NUCLEAR KILLSWITCH — removes overlay after 7s no matter what ──
-  const killTimer = setTimeout(() => {
-    overlay.style.opacity = '0';
-    overlay.style.pointerEvents = 'none';
-    overlay.style.display = 'none';
+  const killTimer = setTimeout(() => forceRemove(), 7000);
+
+  function forceRemove() {
+    clearTimeout(killTimer);
+    overlay.style.cssText = 'display:none!important;opacity:0!important;pointer-events:none!important;visibility:hidden!important;';
+    overlay.classList.add('intro-done');
     try { overlay.remove(); } catch(e) {}
-  }, 7000);
+  }
 
   const termOutput = document.getElementById('intro-term-output');
   const grantedEl  = document.getElementById('intro-granted');
@@ -132,8 +135,7 @@ export function initIntro() {
         // Hard remove — no waiting for any event
         overlay.style.display = 'none';
         overlay.style.pointerEvents = 'none';
-        clearTimeout(killTimer);
-        try { overlay.remove(); } catch(e) { /* already gone */ }
+        forceRemove();
       }
     }, INTERVAL);
   }
