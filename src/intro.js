@@ -179,6 +179,16 @@ export function initIntro() {
     tryReveal();
   }
 
+  // ── Safety timeout — never freeze if models fail or take too long ──
+  // After 12s we force the reveal regardless of model state
+  setTimeout(() => {
+    if (!glitchStarted) {
+      console.warn('Intro: force-revealing after timeout (models may have failed)');
+      modelsReady = true;
+      tryReveal();
+    }
+  }, 12000);
+
   // ── Start the sequence ────────────────────────────────────────
   runTerminal(() => {
     // Terminal done — show ACCESS GRANTED, then wait for models
